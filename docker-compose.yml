@@ -28,10 +28,24 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # 開発時のみ: ホットリロード用にマウントし、CMD を上書き
-    # volumes:
-    #   - ./backend:/app
-    # command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # --- フロントエンド（Next.js）---
+  frontend:
+    build:
+      context: ./frontend          # どのフォルダをビルドするか
+      dockerfile: Dockerfile       # その中のどの Dockerfile を使うか
+    container_name: todo_frontend
+    environment:
+      # ブラウザが API を叩く先（ブラウザはホストから見るので localhost:8000）
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"               # ホストの3000番 → コンテナの3000番（Next.js）
+    volumes:
+      - ./frontend:/app            # ローカルの frontend をコンテナの /app にマウント（編集が即反映）
+      - frontend_node_modules:/app/node_modules  # node_modules はコンテナ用を保持（上書きされない）
+    depends_on:
+      - backend                    # backend のあとに起動（API が先に立つ）
+    command: npm run dev
 
   backend:
     build: .
@@ -44,3 +58,4 @@ services:
 
 volumes:
   postgres_data:
+  frontend_node_modules:           # フロント用の名前付きボリューム（node_modules 退避用）
