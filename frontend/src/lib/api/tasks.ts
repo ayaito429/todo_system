@@ -12,7 +12,7 @@ export async function getTasks():Promise<Task[]> {
   return data as Task[];
 }
 
-export async function createTask(body:Promise<TaskCreate>) {
+export async function createTask(body: TaskCreate) {
   const url = `${apiClient.baseUrl}/tasks`;
   const res = await fetch(url, {
     method: "POST",
