@@ -38,8 +38,10 @@ services:
       dockerfile: Dockerfile       # その中のどの Dockerfile を使うか
     container_name: todo_frontend
     environment:
-      # ブラウザが API を叩く先（ブラウザはホストから見るので localhost:8000）
+      # ブラウザが API を叩く先（ホストの localhost:8000）
       NEXT_PUBLIC_API_URL: http://localhost:8000
+      # サーバーコンポーネントが Docker 内で fetch するときの先（コンテナ名で届く）
+      API_SERVER_URL: http://backend:8000
     ports:
       - "3000:3000"               # ホストの3000番 → コンテナの3000番（Next.js）
     volumes:
