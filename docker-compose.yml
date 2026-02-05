@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: todo_system_dev
       POSTGRES_USER: todo_user
       POSTGRES_PASSWORD: todo_password
+    env_file:
+      - ./backend/db/.env
     ports:
       - "5432:5432"
     volumes:
@@ -21,8 +23,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: todo_backend
-    environment:
-      DATABASE_URL: postgresql://todo_user:todo_password@db:5432/todo_system_dev
+    env_file:
+      - ./backend/.env
     ports:
       - "8000:8000"
     depends_on:
@@ -47,13 +49,6 @@ services:
       - backend                    # backend のあとに起動（API が先に立つ）
     command: npm run dev
 
-  backend:
-    build: .
-    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
 
 
 volumes:
