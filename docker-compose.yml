@@ -30,6 +30,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./backend:/app
 
   # --- フロントエンド（Next.js）---
   frontend:
@@ -53,4 +55,4 @@ services:
 
 volumes:
   postgres_data:
-  frontend_node_modules:           # フロント用の名前付きボリューム（node_modules 退避用）
+  frontend_node_modules:        # フロント用の名前付きボリューム（node_modules 退避用）
