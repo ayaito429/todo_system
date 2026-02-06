@@ -11,7 +11,7 @@ const router = useRouter();
 const isNewOpen = pathname === "/tasks/new"
 
   return ( <>
-  {children}
+  {!isNewOpen && children}
   {isNewOpen && (
     <div onClick={() => router.push("/tasks")}>
       <div onClick={(e) => e.stopPropagation()}>
