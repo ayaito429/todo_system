@@ -16,6 +16,9 @@ export async function createTask(body: TaskCreate) {
   const url = `${apiClient.baseUrl}/tasks`;
   const res = await fetch(url, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(body),
   });
   if(!res.ok) {

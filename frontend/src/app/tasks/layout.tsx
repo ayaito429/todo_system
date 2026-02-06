@@ -15,7 +15,7 @@ const isNewOpen = pathname === "/tasks/new"
   {isNewOpen && (
     <div onClick={() => router.push("/tasks")}>
       <div onClick={(e) => e.stopPropagation()}>
-        {/* <button onClick={() => router.push("/tasks")}>閉じる</button> */}
+        {children}
       </div>
     </div>
   )}
