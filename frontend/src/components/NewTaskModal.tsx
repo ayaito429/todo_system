@@ -2,17 +2,21 @@
 import { useRouter } from "next/navigation";
 import {useState} from "react";
 import { createTask } from "@/src/lib/api/tasks";
-import { TaskPriority, TaskStatus } from "../types/task";
+import { Task, TaskPriority, TaskStatus } from "../types/task";
+
+type Props = {
+  task?: Task;
+  onClose?: () => void;
+}
 
 
-
-export default function NewTaskModal() {
-  const [title,setTitle] = useState("");
-  const [description,setDescription] = useState("");
-  const [due_date,setDueDate] = useState("");
-  const [priority,setPriority] = useState<TaskPriority>(1);
+export default function NewTaskModal({task, onClose}:Props) {
+  const [title,setTitle] = useState(task?.title || "");
+  const [description,setDescription] = useState(task?.description || "");
+  const [due_date,setDueDate] = useState(task?.due_date || "");
+  const [priority,setPriority] = useState<TaskPriority>(task?.priority || 1);
   const [user_id,setUserId] = useState(0);
-  const [status,setStatus] = useState<TaskStatus>("未着手");
+  const [status,setStatus] = useState<TaskStatus>(task?.status || "未着手");
   const [ispublic,setPublic] = useState("");
   // const [created_by,setCreatedBy] = useState("");
   // const [updated_by,setUpdatedBy] = useState("");
@@ -68,7 +72,7 @@ export default function NewTaskModal() {
       <label htmlFor="task-ispublic-private">非公開</label>
       </div>
       <div>
-      <label htmlFor="status-todo">ステータス</label>
+      <div>ステータス</div>
       <input type="radio" name="status-todo" id="status-todo" value="未着手" checked={status === "未着手"} onChange={(e) => setStatus(e.target.value as TaskStatus)}/>
       <label htmlFor="status-todo">未着手</label>
       <input type="radio" name="status-todo" id="status-doing" value="対応中" checked={status === "対応中"} onChange={(e) => setStatus(e.target.value as TaskStatus)}/>
@@ -77,7 +81,8 @@ export default function NewTaskModal() {
       <label htmlFor="status-done">完了</label>
       </div>      
       <button onClick={handleCreate}>作成</button>
-      <button onClick={() => router.push("/tasks")}>閉じる</button>
+      <button onClick={onClose || (() => router.push("/tasks"))
+      }>閉じる</button>
     </div>
   );
 }
