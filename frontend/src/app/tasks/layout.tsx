@@ -1,7 +1,25 @@
+"use client";
+import { usePathname, useRouter } from "next/navigation";
+
 export default function TasksLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+const pathname = usePathname();
+const router = useRouter();
+const isNewOpen = pathname === "/tasks/new"
+
+  return ( <>
+  {children}
+  {isNewOpen && (
+    <div onClick={() => router.push("/tasks")}>
+      <div onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
+    </div>
+  )}
+  </>
+
+  )
 }

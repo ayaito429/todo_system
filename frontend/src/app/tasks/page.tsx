@@ -1,19 +1,17 @@
 import TaskCard from "@/src/components/TaskCard";
-import { mockTasks } from "../../mocks/data/tasks";
+import { getTasks } from "@/src/lib/api/tasks";
+import { mockTasks } from "@/src/mocks/data/tasks";
+import Link from "next/link";
 
-export default function TaskListPage() {
+export default async function TaskListPage() {
+  // const tasks = await getTasks();
+const tasks = mockTasks
   return (
     <div>
       <h1>タスク一覧</h1>
+      <Link href={"/tasks/new"}>新規作成</Link>
       <div>
-        <div>
-          <tr>
-            <th>タイトル</th>
-            <th>ステータス</th>
-            <th>担当者</th>
-          </tr>
-        </div>
-        {mockTasks.map((task) => (
+        {tasks.map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}
       </div>
