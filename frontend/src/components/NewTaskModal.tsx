@@ -81,7 +81,7 @@ export default function NewTaskModal({task, onClose}:Props) {
       <label htmlFor="status-done">完了</label>
       </div>      
       <button onClick={handleCreate}>作成</button>
-      <button onClick={onClose ? onClose : () => router.push("/tasks")
+      <button onClick={onClose || (() => router.push("/tasks"))
       }>閉じる</button>
     </div>
   );
