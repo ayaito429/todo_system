@@ -28,8 +28,8 @@ def upgrade() -> None:
     sa.Column('status', sa.String(), nullable=False),
     sa.Column('priority', sa.Integer(), nullable=False),
     sa.Column('due_date', sa.DateTime(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+    sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
     sa.Column('deleted_flag', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -65,13 +65,8 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('deleted_flag', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_todos_id'), 'todos', ['id'], unique=False)
-    # ### end Alembic commands ###
-
+    sa.Column('deleted_flag', sa.Boolean(), nullable=False))
+    
 
 def downgrade() -> None:
     """Downgrade schema."""

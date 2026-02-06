@@ -2,10 +2,6 @@ services:
   db:
     image: postgres:17
     container_name: todo_db
-    environment:
-      POSTGRES_DB: todo_system_dev
-      POSTGRES_USER: todo_user
-      POSTGRES_PASSWORD: todo_password
     env_file:
       - ./backend/db/.env
     ports:

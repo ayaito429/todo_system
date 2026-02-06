@@ -1,0 +1,33 @@
+
+INSERT INTO users (name, email, password, role, team_id, created_at, updated_at, deleted_flag)
+VALUES
+  (
+    '初期ユーザー',
+    'test_user@example.com',
+    '$argon2id$v=19$m=65536,t=3,p=4$VopxztnbG4NQ6n2v9b53Dg$32/rl1qv7Ylqg5M1DC4VsvX6jaXCcvUmwA39-abi3-macosx_11_0_ar',
+    'user',
+    1,
+    NOW(),
+    NOW(),
+    false
+  ),
+  (
+    '初期リーダー',
+    'test_leader@example.com',
+    '$argon2id$v=19$m=65536,t=3,p=4$VopxztnbG4NQ6n2v9b53Dg$32/rl1qv7Ylqg5M1DC4VsvX6jaXCcvUmwA39-abi3-macosx_11_0_ar',
+    'leader',
+    1,
+    NOW(),
+    NOW(),
+    false
+  ),
+  (
+    '初期管理者',
+    'test_admin@example.com',
+    '$argon2id$v=19$m=65536,t=3,p=4$VopxztnbG4NQ6n2v9b53Dg$32/rl1qv7Ylqg5M1DC4VsvX6jaXCcvUmwA39-abi3-macosx_11_0_ar',
+    'admin',
+    1,
+    NOW(),
+    NOW(),
+    false
+  );
