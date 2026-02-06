@@ -2,10 +2,6 @@ services:
   db:
     image: postgres:17
     container_name: todo_db
-    environment:
-      POSTGRES_DB: todo_system_dev
-      POSTGRES_USER: todo_user
-      POSTGRES_PASSWORD: todo_password
     env_file:
       - ./backend/db/.env
     ports:
@@ -30,6 +26,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./backend:/app
 
   # --- フロントエンド（Next.js）---
   frontend:
@@ -55,4 +53,4 @@ services:
 
 volumes:
   postgres_data:
-  frontend_node_modules:           # フロント用の名前付きボリューム（node_modules 退避用）
+  frontend_node_modules:        # フロント用の名前付きボリューム（node_modules 退避用）

@@ -1,5 +1,5 @@
 # backend/db/models/user.py
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 from datetime import datetime   
 from db.base import Base
 
@@ -17,6 +17,10 @@ class Task(Base):
     priority = Column(Integer, nullable=False)
     # 期限日
     due_date = Column(DateTime, nullable=False)
+    # 担当ユーザーID
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # 作成者ID
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     # 作成日時
     created_at = Column(DateTime, default=datetime.now)
     # 更新日時
