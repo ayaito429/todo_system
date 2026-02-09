@@ -14,7 +14,7 @@ class Task(Base):
     # テータス
     status = Column(String, nullable=False)
     # 優先度
-    priority = Column(Integer, nullable=False)
+    priority = Column(String, nullable=False)
     # 期限日
     due_date = Column(DateTime, nullable=False)
     # 担当ユーザーID
