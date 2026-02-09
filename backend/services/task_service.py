@@ -23,10 +23,9 @@ def create_task(db: Session, task_in: TaskCreate, user_id: int) -> Task:
 
     return task_repository.save(db, task)
 
-def get_all_tasks(db, user_role, team_id):
+def get_all_tasks(db, user_role, team_id) -> List[Task]:
 
     if user_role == "admin":
         return task_repository.get_all(db)
-        
     return task_repository.get_by_team(db, team_id)
 

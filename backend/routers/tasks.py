@@ -15,13 +15,6 @@ router = APIRouter(
 )
 
 
-def get_list_tasks_query(
-    user_role: str = Query(..., description="権限（例: admin, user）"),
-    team_id: int | None = Query(None, description="チームID（未指定時は担当者の team_id が NULL のタスク）"),
-) -> ListTasksQuery:
-    return ListTasksQuery(user_role=user_role, team_id=team_id)
-
-
 @router.post("", response_model=TaskResponse)
 def create_task(
     task_in: TaskCreate,
@@ -39,7 +32,7 @@ def create_task(
 def list_tasks(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> List[TaskResponse]:
     return task_service.get_all_tasks(
         db=db,
         user_role=current_user.role,

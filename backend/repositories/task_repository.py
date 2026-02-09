@@ -14,14 +14,14 @@ def save(db: Session, task: Task) -> Task:
     db.refresh(task)
     return task
 
-def get_all(db):
+def get_all(db) -> List[Task]:
     return (
         db.query(Task)
         .filter(Task.deleted_flag == False)
         .all()
     )
 
-def get_by_team(db, team_id):
+def get_by_team(db, team_id) -> List[Task]:
     return (
         db.query(Task)
         .join(User, Task.user_id == User.id)
