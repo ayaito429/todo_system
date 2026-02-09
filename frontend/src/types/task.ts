@@ -1,5 +1,5 @@
 export type TaskStatus = "未着手" | "対応中" | "完了";
-export type TaskPriority = 1 | 2 | 3; //1:高 2:中 3:低
+export type TaskPriority = "高" | "中" | "低"; //1:高 2:中 3:低
 
 //タスク一覧の型
 export type Task = {
@@ -15,6 +15,7 @@ export type Task = {
     role: string;
   };
   created_at: string;
+  created_by: string;
   updated_at: string;
   deleted_at?: string;
 };
@@ -32,4 +33,5 @@ export type TaskCreate = {
   deleted_by?: number;
   deleted_at?: string;
   deleted_flag?: boolean;
+  login_user: number;
 }

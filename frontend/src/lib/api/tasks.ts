@@ -1,5 +1,5 @@
 // import { Task , TaskCreate } from "@/src/types/task";
-// import { apiClient } from "./client";
+import { apiClient } from "./client";
 
 // // タスク一覧取得
 // export async function getTasks():Promise<Task[]> {
@@ -12,22 +12,22 @@
 //   return data as Task[];
 // }
 
-// // タスク作成
-// export async function createTask(body: TaskCreate) {
-//   const url = `${apiClient.baseUrl}/tasks`;
-//   const res = await fetch(url, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify(body),
-//   });
-//   if(!res.ok) {
-//     throw new Error(`タスク作成に失敗しました: ${res.status}`)
-//   }
-//   const data = await res.json();
-//   return data as Task
-// }
+// タスク作成
+export async function createTask(body: TaskCreate) {
+  const url = `${apiClient.baseUrl}/api/tasks`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body),
+  });
+  if(!res.ok) {
+    throw new Error(`タスク作成に失敗しました: ${res.status}`)
+  }
+  const data = await res.json();
+  return data as Task
+}
 
 // // タスク詳細取得
 // export async function getTask(id: number):Promise<Task> {
@@ -98,7 +98,7 @@ export async function getTask(id: number): Promise<Task> {
 }
 
 // タスク作成（モック版）
-export async function createTask(body: TaskCreate) {
-  console.log("Mock API: createTask 実行", body);
-  return { id: Math.floor(Math.random() * 1000), ...body } as Task;
-}
+// export async function createTask(body: TaskCreate) {
+//   console.log("Mock API: createTask 実行", body);
+//   return { id: Math.floor(Math.random() * 1000), ...body } as Task;
+// }

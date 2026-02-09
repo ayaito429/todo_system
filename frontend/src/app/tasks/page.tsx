@@ -15,11 +15,25 @@ const tasks = mockTasks
     <div>
       <h1>タスク一覧</h1>
       <Link href={"/tasks/new"}>新規作成</Link>
-      <div>
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} onClick={() => setSelectedTask(task)}/>
-        ))}
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">タスク名</th>
+            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">ステータス</th>
+            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">優先度</th>
+            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">期限</th>
+            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">担当者</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {tasks.map ((task) => (
+            <TaskCard key={task.id} task= {task} onClick={() => setSelectedTask(task)}/>
+          ))}
+          </tbody>
+        </table>
       </div>
+
       {selectedTask && (
         <NewTaskModal task={selectedTask} onClose={() => setSelectedTask(null)}/>
       )}
