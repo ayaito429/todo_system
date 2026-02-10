@@ -1,8 +1,10 @@
 from pydantic import BaseModel, Field
 from datetime import date, datetime
 
+
 class TaskCreate(BaseModel):
     """タスク新規作成用（API リクエストボディ）"""
+
     # タスク名
     title: str = Field(..., min_length=1, max_length=100)
     # タスクの詳細
@@ -18,10 +20,12 @@ class TaskCreate(BaseModel):
     # 作成者ユーザーID
     login_user: int = Field(...)
 
+
 class TaskResponse(BaseModel):
     """
     新規作成したタスク情報を返却するレスポンスモデル
     """
+
     # タスクID
     id: int
     # タイトル
@@ -33,7 +37,7 @@ class TaskResponse(BaseModel):
     # 優先度
     priority: str
     # 期限日
-    due_date: date 
+    due_date: date
     # 担当ユーザーID
     user_id: int
     # 作成ユーザーID
@@ -46,7 +50,20 @@ class TaskResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class ListTasksQuery(BaseModel):
-    """タスク一覧取得時のクエリパラメータ（Postman 検証用：current_user は使わない）"""
-    user_role: str
-    team_id: int | None = None
+
+class TaskUpdate(BaseModel):
+    """
+    タスク更新用（API リクエストボディ）
+    """
+    # タイトル
+    title: str | None
+    # 詳細
+    description: str | None
+    # 優先度
+    priority: str | None
+    # 期限日
+    due_date: date | None
+    # ステータス
+    status: str | None
+    # 担当ユーザー
+    user_id: int | None

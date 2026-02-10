@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from db.models.task import Task
-from schemas.task import TaskCreate
+from schemas.task import TaskCreate, TaskUpdate
 from repositories import task_repository
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
+
 
 def create_task(db: Session, task_in: TaskCreate, user_id: int) -> Task:
     """
@@ -19,13 +20,25 @@ def create_task(db: Session, task_in: TaskCreate, user_id: int) -> Task:
         deleted_flag=False,
         user_id=task_in.user_id,
         created_by=task_in.login_user,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
     )
 
     return task_repository.save(db, task)
 
-def get_all_tasks(db, user_role, team_id) -> List[Task]:
 
+def get_all_tasks(db, user_role, team_id) -> List[Task]:
+    """
+    タスク一覧取得
+    """
     if user_role == "admin":
         return task_repository.get_all(db)
     return task_repository.get_by_team(db, team_id)
 
+
+def update_task(db: Session, task_id: int, update_task: TaskUpdate) -> Task | None:
+    """
+    タスク更新。渡されたフィールドのみ更新（None は変更しない）。
+    存在しない task_id の場合は None を返す。
+    """
+    return task_repository.update(db, task_id, update_task)

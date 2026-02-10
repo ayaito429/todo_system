@@ -24,7 +24,7 @@ class Task(Base):
     # 作成者ID
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     # 作成日時
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime)
     # 更新日時
     updated_at = Column(DateTime, default=datetime.now)
     # 削除フラグ
