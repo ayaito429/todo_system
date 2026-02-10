@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from db.models.task import Task
 from schemas.task import TaskCreate, TaskUpdate
 from repositories import task_repository
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 
@@ -20,7 +20,8 @@ def create_task(db: Session, task_in: TaskCreate, user_id: int) -> Task:
         deleted_flag=False,
         user_id=task_in.user_id,
         created_by=task_in.login_user,
-        created_at=datetime.now()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
     )
 
     return task_repository.save(db, task)
