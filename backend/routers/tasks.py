@@ -48,7 +48,10 @@ def list_tasks(
 
 @router.put("/{task_id}", response_model=TaskResponse)
 def task_update(
-    task_id: int, update_task: TaskUpdate, db: Session = Depends(get_db)
+    task_id: int,
+    update_task: TaskUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> TaskResponse:
     """
     指定IDのタスクを更新する（部分更新可。未指定フィールドは変更しない）。

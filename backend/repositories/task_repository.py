@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from db.models.task import Task
 from db.models.user import User
 from schemas.task import TaskUpdate
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def save(db: Session, task: Task) -> Task:
@@ -66,6 +67,6 @@ def delete(db: Session, task_id: int) -> bool:
         task.updated_at = datetime.now(timezone.utc)
         db.commit()
         return True
-    except Exception:
+    except SQLAlchemyError:
         db.rollback()
         raise
