@@ -42,3 +42,9 @@ def update_task(db: Session, task_id: int, update_task: TaskUpdate) -> Task | No
     存在しない task_id の場合は None を返す。
     """
     return task_repository.update(db, task_id, update_task)
+    
+def delete_task(db: Session, task_id: int) -> bool:
+    """
+    タスクを削除する。削除した場合 True、該当が存在しない場合 False。
+    """
+    return task_repository.delete(db, task_id)
