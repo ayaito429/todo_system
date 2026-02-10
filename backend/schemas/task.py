@@ -17,7 +17,7 @@ class TaskCreate(BaseModel):
     due_date: date = Field(...)
     # 担当ユーザーID
     user_id: int = Field(...)
-    # 作成者ユーザーIDÏ
+    # 作成者ユーザーID
     login_user: int = Field(...)
 
 
