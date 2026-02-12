@@ -12,7 +12,7 @@ export default function StatusBadge({ status }: Props) {
   };
   return (
     <span className="px-2.5 py-0.75 border-2 border-[#333] rounded-md font-bold text-[11px] bg-white">
-      {labels[status]}
+      {/* {labels[status]} */}
     </span>
   );
 }

@@ -5,21 +5,27 @@ import StatusBadge from "./StatusBadge";
 
 type Props = {
   task: Task;
-  onClick: () => void;
+  layout: string;
 };
 
-export default function TaskCard({ task ,onClick}: Props) {
+export default function TaskCard({ task, layout }: Props) {
   return (
-          <tr key={task.id} onClick={onClick}>
-            <td>
-              <p>{task.title}</p>
-              <p>{task.description}</p>
-              </td>
-            <td>{task.status}</td>
-            <td>{task.priority}</td>
-            <td>{task.due_date}</td>
-            <td>{task.user.name}</td>
-          </tr>
-       
+    <Link href={`/tasks/${task.id}`}>
+      <div className={`${layout} px-4 py-4 border-b`}>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <span className="font-medium">{task.title}</span>
+            <span className="text-xs line-clamp-1">{task.description}</span>
+          </div>
+        </div>
+
+        <div className="flex">
+          <span className="px-2 py-1 text-xs rounded-md ">{task.status}</span>
+        </div>
+
+        <div className="text-sm">{task.priority}</div>
+        <div className="text-sm">{task.due_date}</div>
+      </div>
+    </Link>
   );
 }
