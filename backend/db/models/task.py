@@ -23,6 +23,8 @@ class Task(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     # 作成者ID
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # 更新者ID
+    updated_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     # 作成日時
     created_at = Column(DateTime)
     # 更新日時
@@ -41,4 +43,10 @@ class Task(Base):
         "User",
         foreign_keys=[created_by],
         back_populates="created_tasks",
+    )
+    # 更新者（updated_by に対応）
+    updater = relationship(
+        "User",
+        foreign_keys=[updated_by],
+        back_populates="updated_tasks",
     )

@@ -32,9 +32,15 @@ class User(Base):
         foreign_keys="Task.user_id",
         back_populates="assigned_user",
     )
-    # 作成したタスク（created_by で自分が作成したタスク）
+    # タスク作成者
     created_tasks = relationship(
         "Task",
         foreign_keys="Task.created_by",
         back_populates="creator",
+    )
+    # タスク更新者
+    updated_tasks = relationship(
+        "Task",
+        foreign_keys="Task.updated_by",
+        back_populates="updater",
     )
