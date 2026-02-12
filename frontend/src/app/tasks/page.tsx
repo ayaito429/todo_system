@@ -9,18 +9,16 @@ import { useTaskList } from "@/src/contexts/TaskListContent";
 export default function TaskListPage() {
   const { tasks, setTasks } = useTaskList();
   const gridLayout =
-    "grid grid-cols-[1fr_120px_100px_120px_120px] gap-4 item-center";
+    "grid grid-cols-[1fr_120px_100px_120px_120px] gap-4 items-center";
 
   useEffect(() => {
     getTasks()
       .then((data) => {
-        console.log("一覧でーた", data);
         setTasks(data);
       })
       .catch(console.error);
   }, [setTasks]);
 
-  console.log("tasks一覧", tasks);
   return (
     <div className="min-h-screen p-8">
       <header className="flex justify-between items-center mb-8">

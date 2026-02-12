@@ -39,7 +39,7 @@ export default function TaskDetailView() {
         <button
           type="button"
           onClick={() => router.push("/tasks")}
-          className="mt-2 text-blue-600 undeline"
+          className="mt-2 text-blue-600 underline"
         >
           一覧に戻る
         </button>

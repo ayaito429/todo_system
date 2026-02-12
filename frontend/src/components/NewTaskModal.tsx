@@ -101,7 +101,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
             type="radio"
             name="status-todo"
             id="status-todo"
-            readOnly={isView}
+            disabled={isView}
             value="未着手"
             checked={status === "未着手"}
             onChange={(e) => setStatus(e.target.value as TaskStatus)}
@@ -111,7 +111,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
             type="radio"
             name="status-todo"
             id="status-doing"
-            readOnly={isView}
+            disabled={isView}
             value="対応中"
             checked={status === "対応中"}
             onChange={(e) => setStatus(e.target.value as TaskStatus)}
@@ -121,7 +121,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
             type="radio"
             name="status-todo"
             id="status-done"
-            readOnly={isView}
+            disabled={isView}
             value="完了"
             checked={status === "完了"}
             onChange={(e) => setStatus(e.target.value as TaskStatus)}
@@ -172,7 +172,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
             type="radio"
             name="公開設定"
             id="task-ispublic-public"
-            readOnly={isView}
+            disabled={isView}
             value="public"
             checked={ispublic === "public"}
             onChange={(e) => setPublic(e.target.value)}
@@ -182,7 +182,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
             type="radio"
             name="公開設定"
             id="task-ispublic-private"
-            readOnly={isView}
+            disabled={isView}
             value="private"
             checked={ispublic === "private"}
             onChange={(e) => setPublic(e.target.value)}
