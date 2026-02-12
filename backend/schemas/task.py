@@ -17,8 +17,8 @@ class TaskCreate(BaseModel):
     due_date: date = Field(...)
     # 担当ユーザーID
     user_id: int = Field(...)
-    # 作成者ユーザーID
-    login_user: int = Field(...)
+    # 作成者ID（API では送らず、ルーターで current_user.id を注入する）
+    login_user: int | None = None
 
 
 class TaskResponse(BaseModel):
@@ -40,8 +40,16 @@ class TaskResponse(BaseModel):
     due_date: date
     # 担当ユーザーID
     user_id: int
+    # 担当ユーザー名（未割り当て時は None）
+    user_name: str | None
     # 作成ユーザーID
     created_by: int
+    # 作成ユーザー名
+    created_name: str
+    # 更新ユーザーID
+    updated_by: int
+    # 更新ユーザー名
+    updated_name: str
     # 作成日時
     created_at: datetime
     # 更新日時
@@ -67,3 +75,5 @@ class TaskUpdate(BaseModel):
     status: str | None
     # 担当ユーザー
     user_id: int | None
+    # 更新者ID（API では送らず、ルーターで current_user.id を注入する）
+    login_user: int | None = None
