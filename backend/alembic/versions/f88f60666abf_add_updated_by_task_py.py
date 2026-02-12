@@ -36,4 +36,5 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    pass
+    op.drop_constraint("fk_tasks_updated_by_users", "tasks", type_="foreignkey")
+    op.drop_column("tasks", "updated_by")

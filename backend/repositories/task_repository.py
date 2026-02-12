@@ -17,6 +17,7 @@ def save(db: Session, task: Task) -> Task:
     db.add(task)
     db.commit()
     db.refresh(task)
+    db.refresh(task, ["assigned_user", "creator", "updater"])
     return task
 
 

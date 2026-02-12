@@ -27,7 +27,7 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
         updated_at=datetime.now(timezone.utc),
     )
     task = task_repository.save(db, task)
-    task = task_repository.get_by_id(db, task.id)
+
     if task is None:
         raise RuntimeError("Task was saved but could not be reloaded")
 
@@ -55,7 +55,8 @@ def get_all_tasks(db, user_role, team_id) -> List[Task]:
     """
     if user_role == "admin":
         tasks =  task_repository.get_all(db)
-    tasks = task_repository.get_by_team(db, team_id)
+    else:
+        tasks = task_repository.get_by_team(db, team_id)
 
     return [
         TaskResponse(
@@ -83,7 +84,8 @@ def update_task(db: Session, task_id: int, update_task: TaskUpdate, updated_by: 
     タスク更新。渡されたフィールドのみ更新（None は変更しない）。
     存在しない task_id の場合は None を返す。
     """
-    task = task_repository.update(db, task_id, update_task)
+    update_task_with_user = update_task.model_copy(update={"login_user": updated_by})
+    task = task_repository.update(db, task_id, update_task_with_user)
     if task is None:
         return None
 

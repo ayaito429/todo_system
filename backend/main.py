@@ -1,11 +1,14 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from core.handlers import register_exception_handlers
 from db.base import Base
 from db.session import engine
 from db import models
 from routers.tasks import router as tasks_router
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
