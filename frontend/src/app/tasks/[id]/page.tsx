@@ -1,12 +1,20 @@
-export default function TaskDetailPage({
+import { notFound } from "next/navigation";
+import TaskDetailView from "./TaskDetailView";
+
+export default async function TaskDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+  const numericId = Number(id);
+
+  if (Number.isNaN(numericId)) {
+    notFound();
+  }
   return (
     <div>
-      <h1>タスク詳細・編集</h1>
-      {/* TODO: モーダル表示、params.id で取得 */}
+      <TaskDetailView />
     </div>
   );
 }

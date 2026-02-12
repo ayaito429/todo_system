@@ -1,42 +1,46 @@
-'use client';
-import {useState} from "react";
-import NewTaskModal from "@/src/components/NewTaskModal";
+"use client";
+
+import { useEffect } from "react";
 import TaskCard from "@/src/components/TaskCard";
 import { getTasks } from "@/src/lib/api/tasks";
-import { mockTasks } from "@/src/mocks/data/tasks";
 import Link from "next/link";
-import { Task } from "@/src/types/task";
+import { useTaskList } from "@/src/contexts/TaskListContent";
 
 export default function TaskListPage() {
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  // const tasks = await getTasks();
-const tasks = mockTasks
-  return (
-    <div>
-      <h1>タスク一覧</h1>
-      <Link href={"/tasks/new"}>新規作成</Link>
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b">
-            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">タスク名</th>
-            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">ステータス</th>
-            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">優先度</th>
-            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">期限</th>
-            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground">担当者</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {tasks.map ((task) => (
-            <TaskCard key={task.id} task= {task} onClick={() => setSelectedTask(task)}/>
-          ))}
-          </tbody>
-        </table>
-      </div>
+  const { tasks, setTasks } = useTaskList();
+  const gridLayout =
+    "grid grid-cols-[1fr_120px_100px_120px_120px] gap-4 item-center";
 
-      {selectedTask && (
-        <NewTaskModal task={selectedTask} onClose={() => setSelectedTask(null)}/>
-      )}
+  useEffect(() => {
+    getTasks()
+      .then((data) => {
+        console.log("一覧でーた", data);
+        setTasks(data);
+      })
+      .catch(console.error);
+  }, [setTasks]);
+
+  console.log("tasks一覧", tasks);
+  return (
+    <div className="min-h-screen p-8">
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold tracking-tight">タスク一覧</h1>
+        <Link href={"/tasks/new"}>新規作成</Link>
+      </header>
+      <div className="border rounded-lg">
+        <div className={`${gridLayout} px-4 py-3 text-sm font-medium border-b`}>
+          <div>タスク名</div>
+          <div>ステータス</div>
+          <div>優先度</div>
+          <div>期限</div>
+          <div>担当者</div>
+        </div>
+        <div className="">
+          {tasks.map((task) => (
+            <TaskCard key={task.id} task={task} layout={gridLayout} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
