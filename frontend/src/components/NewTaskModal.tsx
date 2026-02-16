@@ -134,7 +134,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
               <p className="text-red-600 text-sm mt-1">{errors.description}</p>
             )}
           </div>
-          <div className="grid grid-clos-1 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div className="flex flex-col">
               <label htmlFor="status">ステータス</label>
               <select

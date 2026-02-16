@@ -29,20 +29,7 @@ export async function createTask(body: TaskCreate) {
   return data as Task;
 }
 
-// // タスク詳細取得
-// export async function getTask(id: number):Promise<Task> {
-//   const url = `${apiClient.baseUrl}/tasks/${id}`;
-//   const res = await fetch(url,{
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json"
-//     }
-// });
-//   if(!res.ok) {
-//     throw new Error(`タスクが見つかりませんでした: ${res.status}`)
-//   }
-//   return await res.json() as Task;
-// }
+
 
 // //タスク更新
 export async function updateTask(id: number, body: TaskCreate) {
@@ -87,9 +74,3 @@ export async function getTask(id: number): Promise<Task> {
   if (!task) throw new Error("Task not found");
   return task;
 }
-
-// タスク作成（モック版）
-// export async function createTask(body: TaskCreate) {
-//   console.log("Mock API: createTask 実行", body);
-//   return { id: Math.floor(Math.random() * 1000), ...body } as Task;
-// }

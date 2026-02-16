@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function Header() {
   return (
-    <header className="bg-white h-15 flex items-center px-10">
+    <header className="bg-white h-16 flex items-center px-10">
       <div className="flex justify-between w-full">
         <div className="">
           <span>Task Flow</span>
