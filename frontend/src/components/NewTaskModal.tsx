@@ -1,14 +1,20 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createTask, updateTask } from "@/src/lib/api/tasks";
+import { createTask, deleteTask, updateTask } from "@/src/lib/api/tasks";
 import { Task, TaskPriority, TaskStatus } from "../types/task";
+import StatusBadge from "./StatusBadge";
 
 type Props = {
   task?: Task;
   mode?: "create" | "view" | "edit";
   onClose?: () => void;
 };
+function formatDateOnly(isoString: string | undefined): string {
+  if (!isoString) return "-";
+  return isoString.slice(0, 10);
+}
 
 export default function NewTaskModal({ task, mode, onClose }: Props) {
   const [title, setTitle] = useState(task?.title || "");
@@ -30,7 +36,27 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
   const isEdit = currentMode === "edit";
   const isCreate = currentMode === "create";
 
+  const isReadOnly = isView;
+  const isFormMode = isCreate || isEdit;
+
+  const [errors, setErrors] = useState<{
+    title?: string;
+    description?: string;
+    due_date?: string;
+  }>({});
+
+  const validateCreate = (): boolean => {
+    const next: { title?: string; description?: string; due_date?: string } =
+      {};
+    if (!title.trim()) next.title = "タスク名を入力して下さい";
+    if (!description.trim()) next.description = "詳細説明を入力して下さい";
+    if (!due_date.trim()) next.due_date = "期限を入力して下さい";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
   const handleCreate = async () => {
+    if (!validateCreate()) return;
     try {
       await createTask({
         title: title,
@@ -67,164 +93,217 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!task?.id) return;
+    if (!window.confirm("今タスクを削除しますか？")) return;
+    try {
+      await deleteTask(task?.id);
+      router.push("/tasks");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <div>
-      <h2>
-        {isCreate && "新規タスク作成"}
-        {isView && "タスク詳細"}
-        {isEdit && "タスク編集"}
-      </h2>
-      <div className="flex flex-col">
-        <label htmlFor="task-title">タスク名</label>
-        <input
-          id="task-title"
-          type="text"
-          readOnly={isView}
-          className="border-2 border-gray-800 bg-white p-4 rounded h-10"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <label htmlFor="task-description">詳細説明</label>
-        <input
-          id="task-description"
-          type="text"
-          readOnly={isView}
-          className="border-2 border-gray-800 bg-white p-4 rounded h-10"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
-      <div className="flex justify-between">
-        <div>
-          <label htmlFor="status">ステータス</label>
-          <input
-            type="radio"
-            name="status-todo"
-            id="status-todo"
-            disabled={isView}
-            value="未着手"
-            checked={status === "未着手"}
-            onChange={(e) => setStatus(e.target.value as TaskStatus)}
-          />
-          <label htmlFor="status-todo">未着手</label>
-          <input
-            type="radio"
-            name="status-todo"
-            id="status-doing"
-            disabled={isView}
-            value="対応中"
-            checked={status === "対応中"}
-            onChange={(e) => setStatus(e.target.value as TaskStatus)}
-          />
-          <label htmlFor="status-doing">対応中</label>
-          <input
-            type="radio"
-            name="status-todo"
-            id="status-done"
-            disabled={isView}
-            value="完了"
-            checked={status === "完了"}
-            onChange={(e) => setStatus(e.target.value as TaskStatus)}
-          />
-          <label htmlFor="status-done">完了</label>
-        </div>
-        <div>
-          <label htmlFor="task-priority">優先度</label>
-          <select
-            id="task-priority"
-            value={priority}
-            disabled={isView}
-            onChange={(e) => setPriority(e.target.value as TaskPriority)}
-          >
-            <option value="高">高</option>
-            <option value="中">中</option>
-            <option value="低">低</option>
-          </select>
-        </div>
-      </div>
-      <div className="flex flex-col">
-        <label htmlFor="task-due-date">期限</label>
-        <input
-          id="task-due-date"
-          type="date"
-          readOnly={isView}
-          className="border-2 border-gray-800 bg-white p-4 rounded h-10"
-          value={due_date}
-          onChange={(e) => setDueDate(e.target.value)}
-        />
-      </div>
-      <div className="flex justify-between space-y-2">
-        <label htmlFor="task-user-id">担当者</label>
-        <select
-          name=""
-          id="task-user-id"
-          value={user_id}
-          disabled={isView}
-          onChange={(e) => setUserId(Number(e.target.value))}
-        >
-          <option value="1">田中</option>
-          <option value="2">佐藤</option>
-          <option value="3">山田</option>
-        </select>
-        <div>
-          <label htmlFor="task-ispublic">公開設定</label>
-          <input
-            type="radio"
-            name="公開設定"
-            id="task-ispublic-public"
-            disabled={isView}
-            value="public"
-            checked={ispublic === "public"}
-            onChange={(e) => setPublic(e.target.value)}
-          />
-          <label htmlFor="task-ispublic-public">公開</label>
-          <input
-            type="radio"
-            name="公開設定"
-            id="task-ispublic-private"
-            disabled={isView}
-            value="private"
-            checked={ispublic === "private"}
-            onChange={(e) => setPublic(e.target.value)}
-          />
-          <label htmlFor="task-ispublic-private">非公開</label>
-        </div>
-      </div>
-      <div>
-        <span>作成:{task?.created_at}</span>
-        <span>更新:{task?.updated_at}</span>
-        <span>作成者:{task?.created_by}</span>
-      </div>
-      {isCreate && (
-        <button
-          type="button"
-          onClick={handleCreate}
-          className="bg-blue-500 text-white p-2 rounded h-10"
-        >
-          作成
-        </button>
+    <div className="rounded-xl border  bg-white">
+      {isFormMode ? (
+        <form action="">
+          <div className="flex flex-col">
+            <label htmlFor="task-title">タスク名</label>
+            <input
+              id="task-title"
+              type="text"
+              readOnly={isView}
+              className="border-2 border-gray-800 bg-white p-4 rounded h-10"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            {errors.title && (
+              <p className="text-red-600 text-sm mt-1">{errors.title}</p>
+            )}
+            <label htmlFor="task-description">詳細説明</label>
+            <textarea
+              id="task-description"
+              rows={4}
+              readOnly={isView}
+              className="border-2 border-gray-800 bg-white p-4 rounded"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            {errors.description && (
+              <p className="text-red-600 text-sm mt-1">{errors.description}</p>
+            )}
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <div className="flex flex-col">
+              <label htmlFor="status">ステータス</label>
+              <select
+                name=""
+                id=""
+                value={status}
+                disabled={isView}
+                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                className="border rounded"
+              >
+                <option value="未着手">未着手</option>
+                <option value="対応中">対応中</option>
+                <option value="完了">完了</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="task-priority">優先度</label>
+              <select
+                id="task-priority"
+                value={priority}
+                disabled={isView}
+                onChange={(e) => setPriority(e.target.value as TaskPriority)}
+                className="flex "
+              >
+                <option value="高">高</option>
+                <option value="中">中</option>
+                <option value="低">低</option>
+              </select>
+            </div>
+            <div className="">
+              <label htmlFor="task-due-date">期限</label>
+              <input
+                id="task-due-date"
+                type="date"
+                readOnly={isView}
+                className="border-2 border-gray-800 bg-white p-4 rounded h-10 flex"
+                value={due_date}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
+              {errors.due_date && (
+                <p className="text-red-600 text-sm mt-1">{errors.due_date}</p>
+              )}
+            </div>
+            <div className="justify-between">
+              <label htmlFor="task-user-id">担当者</label>
+              <select
+                name=""
+                id="task-user-id"
+                value={user_id}
+                disabled={isView}
+                onChange={(e) => setUserId(Number(e.target.value))}
+                className="flex"
+              >
+                <option value="1">田中</option>
+                <option value="2">佐藤</option>
+                <option value="3">山田</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="task-ispublic">公開設定</label>
+              <input
+                type="radio"
+                name="公開設定"
+                id="task-ispublic-public"
+                disabled={isView}
+                value="public"
+                checked={ispublic === "public"}
+                onChange={(e) => setPublic(e.target.value)}
+              />
+              <label htmlFor="task-ispublic-public">公開</label>
+              <input
+                type="radio"
+                name="公開設定"
+                id="task-ispublic-private"
+                disabled={isView}
+                value="private"
+                checked={ispublic === "private"}
+                onChange={(e) => setPublic(e.target.value)}
+              />
+              <label htmlFor="task-ispublic-private">非公開</label>
+            </div>
+          </div>
+          <div>
+            {isEdit && task && (
+              <button type="button" onClick={handleDelete}>
+                削除
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose || (() => router.push("/tasks"))}
+            >
+              キャンセル
+            </button>
+          </div>
+          <button>{isCreate ? "作成" : "保存"}</button>
+        </form>
+      ) : (
+        <>
+          <div className="px-10 py-6 space-y-6">
+            <div className="flex justify-between border-b border-gray-200">
+              <h1 className="text-xl font-semibold text-gray-900 mb-4">
+                {title}
+              </h1>
+              <div className="ml-4 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentMode("edit")}
+                  className="border border-gray-200 rounded px-3 py-1 mr-2"
+                >
+                  編集
+                </button>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-sm font-medium text-gray-500 mb-1">
+                詳細説明
+              </h2>
+              <p className="text-gray-900">
+                {description || "説明がありません"}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg mb-4 border border-gray-200 ">
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">
+                  ステータス
+                </p>
+                <StatusBadge status={status} />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">優先度</p>
+                <p className="text-sm">{priority}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">期限</p>
+                <p>{due_date}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">担当者</p>
+                <p>{task?.user_name}</p>
+              </div>
+            </div>
+
+            <div className="text-xs text-gray-500 border-t border-gray-200 pt-4 mb-4">
+              <span>作成日:{formatDateOnly(task?.created_at)}</span>
+              <span className="mx-2">|</span>
+              <span>最終更新:{formatDateOnly(task?.updated_at)}</span>
+              <span className="mx-2">|</span>
+              <span>作成者:{task?.created_name}</span>
+            </div>
+          </div>
+
+          {/* <button
+              type="button"
+              onClick={handleDelete}
+              className="bg-red-500 text-white p-2 rounded h-10"
+              >
+              削除
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose || (() => router.push("/tasks"))}
+              className="bg-green-500 text-white p-2 rounded h-10"
+            >
+              閉じる
+            </button> */}
+        </>
       )}
-      {isView && (
-        <button type="button" onClick={() => setCurrentMode("edit")}>
-          編集
-        </button>
-      )}
-      {isEdit && (
-        <button
-          type="button"
-          onClick={handleUpdate}
-          className="bg-red-500 text-white p-2 rounded h-10"
-        >
-          保存
-        </button>
-      )}
-      <button
-        type="button"
-        onClick={onClose || (() => router.push("/tasks"))}
-        className="bg-red-500 text-white p-2 rounded h-10"
-      >
-        閉じる
-      </button>
     </div>
   );
 }

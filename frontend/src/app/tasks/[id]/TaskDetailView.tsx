@@ -48,13 +48,12 @@ export default function TaskDetailView() {
   }
 
   return (
-    <div>
-      <h1>タスク詳細・編集</h1>
+    <>
       <NewTaskModal
         task={task}
         mode="view"
         onClose={() => router.push("/tasks")}
       />
-    </div>
+    </>
   );
 }

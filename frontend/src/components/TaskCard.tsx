@@ -19,12 +19,13 @@ export default function TaskCard({ task, layout }: Props) {
           </div>
         </div>
 
-        <div className="flex">
-          <span className="px-2 py-1 text-xs rounded-md ">{task.status}</span>
+        <div className="flex justify-start">
+          <StatusBadge status={task.status} />
         </div>
 
         <div className="text-sm">{task.priority}</div>
         <div className="text-sm">{task.due_date}</div>
+        <div className="text-sm">{task.user_name}</div>
       </div>
     </Link>
   );
