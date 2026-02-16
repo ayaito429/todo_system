@@ -3,7 +3,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# 依存インストール
+# 依存インストール（passlib[argon2] は requirements.txt に含まれており security.py で使用）
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

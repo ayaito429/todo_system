@@ -61,9 +61,11 @@ def get_by_team(db, team_id) -> List[Task]:
         )
         .join(User, Task.user_id == User.id)
         .filter(User.team_id == team_id)
+        .filter(User.role != 'admin')
         .filter(Task.deleted_flag == False)
         .all()
     )
+    
 
 
 def update(db: Session, task_id: int, update_task: TaskUpdate) -> Task | None:
