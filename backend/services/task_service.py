@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from core.exceptions import AppException
 from db.models.task import Task
 from schemas.task import TaskCreate, TaskResponse, TaskUpdate
 from repositories import task_repository
@@ -11,7 +12,11 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
     タスク新規作成。作成者・更新者は task_in.login_user で記録する（ルーターで current_user.id を注入すること）。
     """
     if task_in.login_user is None:
-        raise ValueError("login_user is required for create_task")
+        raise AppException(
+            status_code=404,
+            error_code="NOT_FOUND",
+            message="ユーザーが存在しません。"
+        )
 
     task = Task(
         title=task_in.title,
@@ -29,7 +34,11 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
     task = task_repository.save(db, task)
 
     if task is None:
-        raise RuntimeError("Task was saved but could not be reloaded")
+        raise AppException(
+            status_code=500,
+            error_code="INTERNAL_SERVER_ERROR",
+            message="サーバー内部でエラーが発生しました。"
+        )
 
     return TaskResponse(
         id=task.id,
@@ -44,17 +53,19 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
         created_at=task.created_at,
         updated_at=task.updated_at,
         user_name=task.assigned_user.name if task.assigned_user else None,
-        created_name=task.creator.name,
-        updated_name=task.updater.name,
+        created_name=task.creator.name if task.creator else None,
+        updated_name=task.updater.name if task.updater else None,
     )
 
 
-def get_all_tasks(db, user_role, team_id) -> List[Task]:
+def get_all_tasks(db, user_role, team_id) -> List[TaskResponse]:
     """
     タスク一覧取得
     """
     if user_role == "admin":
         tasks =  task_repository.get_all(db)
+    elif team_id is None:
+        tasks = []
     else:
         tasks = task_repository.get_by_team(db, team_id)
 

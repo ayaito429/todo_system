@@ -6,6 +6,7 @@ from db.base import Base
 from db.session import engine
 from db import models
 from routers.tasks import router as tasks_router
+from routers.auth import router as auth_router
 
 app = FastAPI()
 register_exception_handlers(app)
@@ -19,6 +20,7 @@ app.add_middleware(
 )
 
 app.include_router(tasks_router)
+app.include_router(auth_router)
 
 
 @app.get("/")

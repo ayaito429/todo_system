@@ -24,6 +24,7 @@ def create_task(
     認証済みユーザーのみ実行可能。作成者（created_by / updated_by）は認証ユーザーで固定。
     """
     task_in = task_in.model_copy(update={"login_user": current_user.id})
+    
     return task_service.create_task(db=db, task_in=task_in)
 
 
