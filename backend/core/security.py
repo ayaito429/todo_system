@@ -5,6 +5,7 @@
 認証が必要なルートでは get_current_user（dependencies）が oauth2_scheme でトークンを受け取る。
 """
 from datetime import datetime, timedelta, timezone
+import os
 from passlib.context import CryptContext
 from jose import jwt
 from fastapi.security import OAuth2PasswordBearer
@@ -16,7 +17,7 @@ pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # JWT の署名に使う秘密鍵とアルゴリズム（本番では環境変数にすること）
-SECRET_KEY = "super-secret-key"
+SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
 ALGORITHM = "HS256"
 
 
@@ -30,7 +31,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: dict):
+def create_access_token(data: dict) -> str:
     """
     ペイロードに有効期限 (exp) を付与して JWT を発行。
     data には sub（ユーザーID）や role などを入れる。

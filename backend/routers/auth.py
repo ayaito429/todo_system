@@ -38,7 +38,7 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
         raise AppException(
             status_code=401,
             error_code="USER_NOT_FOUND",
-            message="ユーザーが存在しません",
+            message="メールアドレスまたはパスワードが正しくありません",
         )
 
     # JWT に sub（ユーザーID）と role を入れ、アクセストークンを発行
