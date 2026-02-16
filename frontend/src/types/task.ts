@@ -9,13 +9,12 @@ export type Task = {
   status: TaskStatus;
   priority: TaskPriority;
   due_date?: string;
-  user: {
-    id: number;
-    name: string;
-    role: string;
-  };
+  user_id: number;
+  user_name: string;
+  user_role?: string;
   created_at: string;
   created_by: string;
+  created_name: string;
   updated_at: string;
   deleted_at?: string;
 };
@@ -34,4 +33,4 @@ export type TaskCreate = {
   deleted_at?: string;
   deleted_flag?: boolean;
   login_user: number;
-}
+};

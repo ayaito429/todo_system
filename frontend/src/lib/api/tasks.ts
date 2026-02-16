@@ -1,16 +1,16 @@
 // import { Task , TaskCreate } from "@/src/types/task";
 import { apiClient } from "./client";
 
-// // タスク一覧取得
-// export async function getTasks():Promise<Task[]> {
-//   const url = `${apiClient.baseUrl}/tasks`;
-//   const res = await fetch(url);
-//   if(!res.ok) {
-//     throw new Error(`タスクが見つかりませんでした: ${res.status}`)
-//     }
-//     const data = await res.json();
-//   return data as Task[];
-// }
+// タスク一覧取得
+export async function getTasks(): Promise<Task[]> {
+  const url = `${apiClient.baseUrl}/api/tasks`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`タスクが見つかりませんでした: ${res.status}`);
+  }
+  const data = await res.json();
+  return data as Task[];
+}
 
 // タスク作成
 export async function createTask(body: TaskCreate) {
@@ -46,9 +46,9 @@ export async function createTask(body: TaskCreate) {
 
 // //タスク更新
 export async function updateTask(id: number, body: TaskCreate) {
-  const url = `${apiClient.baseUrl}/tasks/${id}`;
+  const url = `${apiClient.baseUrl}/api/tasks/${id}`;
   const res = await fetch(url, {
-    method: "PATCH",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
@@ -60,33 +60,25 @@ export async function updateTask(id: number, body: TaskCreate) {
   return (await res.json()) as Task;
 }
 
-// //タスクの削除
-// export async function deleteTask(id:number) {
-//   const url = `${apiClient.baseUrl}/tasks/${id}`
-//   const res = await fetch(url,{
-//     method: "DELETE",
-//     headers: {
-//       "Content-Type": "application/json"
-//     }
-//   });
-//   if(!res.ok) {
-//     throw new Error(`タスクが削除できませんでした: ${res.status}`)
-//   }
-//   return await res.json() as Task
-// }
+//タスクの削除
+export async function deleteTask(id: number) {
+  const url = `${apiClient.baseUrl}/api/tasks/${id}`;
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`タスクが削除できませんでした: ${res.status}`);
+  }
+  return await res;
+}
 
 // lib/api/tasks.ts
 
 import { Task, TaskCreate } from "@/src/types/task";
 import { mockTasks } from "@/src/mocks/data/tasks"; // モックデータをインポート
-
-// タスク一覧取得（モック版）
-export async function getTasks(): Promise<Task[]> {
-  console.log("Mock API: getTasks 実行");
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockTasks), 500); // 0.5秒後にデータを返す
-  });
-}
 
 // タスク詳細取得（モック版）
 export async function getTask(id: number): Promise<Task> {

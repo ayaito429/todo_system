@@ -1,3 +1,4 @@
+import { Header } from "@/src/components/Header";
 import { TaskListProvider } from "@/src/contexts/TaskListContent";
 
 export default function TasksLayout({
@@ -5,5 +6,10 @@ export default function TasksLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <TaskListProvider>{children}</TaskListProvider>;
+  return (
+    <TaskListProvider>
+      <Header />
+      {children}
+    </TaskListProvider>
+  );
 }
