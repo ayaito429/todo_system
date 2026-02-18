@@ -1,13 +1,10 @@
-import datetime
-from time import timezone
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from services.auth_service import validate_password
 from repositories import user_repository
 from core.dependencies import get_current_user
 from core.exceptions import AppException
-from core.security import create_access_token, get_password_hash, verify_password
+from core.security import create_access_token, verify_password
 from db.models import User
 from db.session import get_db
 from schemas.auth import ChangePasswordRequest, LoginRequest
@@ -43,6 +40,7 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
 
     return {
         "access_token": access_token,
+        "token_type": "bearer",
         "require_password_change": login_user.is_first_login,
     }
 
