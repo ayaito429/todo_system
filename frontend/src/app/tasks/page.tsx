@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import TaskCard from "@/src/components/TaskCard";
 import { getTasks } from "@/src/lib/api/tasks";
 import Link from "next/link";
 import { useTaskList } from "@/src/contexts/TaskListContent";
+import { ProgressChart } from "@/src/components/ProgressChart";
 
 const PAGE_SIZE = 8;
 
@@ -19,6 +20,15 @@ export default function TaskListPage() {
   const gridLayout =
     "grid grid-cols-[1fr_120px_100px_120px_120px] gap-4 items-center";
 
+  const stats = useMemo(
+    () => ({
+      todo: tasks.filter((t) => t.status === "未着手").length,
+      inProgress: tasks.filter((t) => t.status === "対応中").length,
+      done: tasks.filter((t) => t.status === "完了").length,
+    }),
+    [tasks],
+  );
+
   useEffect(() => {
     getTasks()
       .then((data) => {
@@ -28,13 +38,21 @@ export default function TaskListPage() {
   }, [setTasks]);
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen px-30 pt-5">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold tracking-tight">タスク一覧</h1>
-        <Link href={"/tasks/new"} className="border rounded p-2 bg-green-200">
+        <Link
+          href={"/tasks/new"}
+          className="border border-gray-200 rounded-md p-2 bg-blue-500 text-white w-30 flex justify-center"
+        >
           新規作成
         </Link>
       </header>
+      <ProgressChart
+        todo={stats.todo}
+        inProgress={stats.inProgress}
+        done={stats.done}
+      />
       <div className="border rounded-lg">
         <div className={`${gridLayout} px-4 py-3 text-sm font-medium border-b`}>
           <div>タスク名</div>

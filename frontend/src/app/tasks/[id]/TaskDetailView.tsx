@@ -17,7 +17,7 @@ export default function TaskDetailView() {
 
   const taskFromContext = useMemo(
     () => tasks.find((t) => t.id === id),
-    [tasks, id]
+    [tasks, id],
   );
 
   useEffect(() => {
@@ -48,12 +48,12 @@ export default function TaskDetailView() {
   }
 
   return (
-    <>
+    <div>
       <NewTaskModal
         task={task}
         mode="view"
         onClose={() => router.push("/tasks")}
       />
-    </>
+    </div>
   );
 }

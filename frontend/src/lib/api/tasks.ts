@@ -1,10 +1,12 @@
-// import { Task , TaskCreate } from "@/src/types/task";
-import { apiClient } from "./client";
+import { Task , TaskCreate } from "@/src/types/task";
+import { apiClient, getAuthHeaders } from "./client";
 
 // タスク一覧取得
 export async function getTasks(): Promise<Task[]> {
   const url = `${apiClient.baseUrl}/api/tasks`;
-  const res = await fetch(url);
+  const res = await fetch(url,{
+    headers: getAuthHeaders()
+  });
   if (!res.ok) {
     throw new Error(`タスクが見つかりませんでした: ${res.status}`);
   }
@@ -17,9 +19,7 @@ export async function createTask(body: TaskCreate) {
   const url = `${apiClient.baseUrl}/api/tasks`;
   const res = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(body),
   });
   if (!res.ok) {
@@ -36,9 +36,7 @@ export async function updateTask(id: number, body: TaskCreate) {
   const url = `${apiClient.baseUrl}/api/tasks/${id}`;
   const res = await fetch(url, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(body),
   });
   if (!res.ok) {
@@ -52,9 +50,7 @@ export async function deleteTask(id: number) {
   const url = `${apiClient.baseUrl}/api/tasks/${id}`;
   const res = await fetch(url, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
   if (!res.ok) {
     throw new Error(`タスクが削除できませんでした: ${res.status}`);
@@ -62,15 +58,4 @@ export async function deleteTask(id: number) {
   return await res;
 }
 
-// lib/api/tasks.ts
 
-import { Task, TaskCreate } from "@/src/types/task";
-import { mockTasks } from "@/src/mocks/data/tasks"; // モックデータをインポート
-
-// タスク詳細取得（モック版）
-export async function getTask(id: number): Promise<Task> {
-  console.log(`Mock API: getTask(${id}) 実行`);
-  const task = mockTasks.find((t) => t.id === id);
-  if (!task) throw new Error("Task not found");
-  return task;
-}
