@@ -11,13 +11,13 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLodaing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setError("");
-    setLodaing(true);
+    setLoading(true);
     try {
       const data = await login(email, password);
       localStorage.setItem("access_token", data.access_token);
@@ -26,7 +26,7 @@ export default function Home() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "ログインに失敗しました");
     } finally {
-      setLodaing(false);
+      setLoading(false);
     }
   };
 

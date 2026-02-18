@@ -16,7 +16,7 @@ export function getAccessToken(): string | null {
 export function getAuthHeaders(): HeadersInit {
   const token = getAccessToken();
   const headers: Record<string, string> = {
-    "Content-Type": "applicaton/json",
+    "Content-Type": "application/json",
   };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;

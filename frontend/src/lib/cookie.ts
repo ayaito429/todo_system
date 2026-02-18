@@ -5,8 +5,8 @@ const MAX_AGE = 60 * 30; //30分
 export function setAuthCookie(token: string): void {
   if (typeof document === "undefined") return;
   document.cookie = `${COOKIE_NAME}=${encodeURIComponent(
-    token
-  )}; path=/; max-age=[MAX_AGE]; SameSite=Lax`;
+    token,
+  )}; path=/; max-age=${MAX_AGE}; SameSite=Lax; HttpOnly; Secure`;
 }
 
 //トークン用Cookieを削除
