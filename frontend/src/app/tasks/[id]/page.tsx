@@ -13,7 +13,7 @@ export default async function TaskDetailPage({
     notFound();
   }
   return (
-    <div className="px-20 pt-10">
+    <div className="">
       <TaskDetailView />
     </div>
   );

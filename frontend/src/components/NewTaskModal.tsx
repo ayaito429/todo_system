@@ -5,6 +5,7 @@ import { useState } from "react";
 import { createTask, deleteTask, updateTask } from "@/src/lib/api/tasks";
 import { Task, TaskPriority, TaskStatus } from "../types/task";
 import StatusBadge from "./StatusBadge";
+import { ArrowLeft, Trash2 } from "lucide-react";
 
 type Props = {
   task?: Task;
@@ -21,13 +22,13 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
   const [description, setDescription] = useState(task?.description || "");
   const [due_date, setDueDate] = useState(task?.due_date || "");
   const [priority, setPriority] = useState<TaskPriority>(
-    task?.priority || "高"
+    task?.priority || "高",
   );
   const [user_id, setUserId] = useState(1);
   const [status, setStatus] = useState<TaskStatus>(task?.status || "未着手");
   const [ispublic, setPublic] = useState("");
   const [currentMode, setCurrentMode] = useState<"create" | "view" | "edit">(
-    mode ?? (task ? "view" : "create")
+    mode ?? (task ? "view" : "create"),
   );
   // const [created_by,setCreatedBy] = useState("");
   // const [updated_by,setUpdatedBy] = useState("");
@@ -105,189 +106,219 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
   };
 
   return (
-    <div className="rounded-xl border  bg-white">
-      {isFormMode ? (
-        <form action="">
-          <div className="flex flex-col">
-            <label htmlFor="task-title">タスク名</label>
-            <input
-              id="task-title"
-              type="text"
-              readOnly={isView}
-              className="border-2 border-gray-800 bg-white p-4 rounded h-10"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            {errors.title && (
-              <p className="text-red-600 text-sm mt-1">{errors.title}</p>
-            )}
-            <label htmlFor="task-description">詳細説明</label>
-            <textarea
-              id="task-description"
-              rows={4}
-              readOnly={isView}
-              className="border-2 border-gray-800 bg-white p-4 rounded"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            {errors.description && (
-              <p className="text-red-600 text-sm mt-1">{errors.description}</p>
-            )}
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <div className="flex flex-col">
-              <label htmlFor="status">ステータス</label>
-              <select
-                name=""
-                id=""
-                value={status}
-                disabled={isView}
-                onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                className="border rounded"
-              >
-                <option value="未着手">未着手</option>
-                <option value="対応中">対応中</option>
-                <option value="完了">完了</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="task-priority">優先度</label>
-              <select
-                id="task-priority"
-                value={priority}
-                disabled={isView}
-                onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                className="flex "
-              >
-                <option value="高">高</option>
-                <option value="中">中</option>
-                <option value="低">低</option>
-              </select>
-            </div>
-            <div className="">
-              <label htmlFor="task-due-date">期限</label>
+    <div className=" px-30 pt-5">
+      <button
+        type="button"
+        onClick={() => router.push("/tasks")}
+        className="mb-6 flex items-center gap-2 text-sm  hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        タスク一覧に戻る
+      </button>
+      <div className="border rounded-lg px-10 py-6 bg-white">
+        {isFormMode ? (
+          <form action="">
+            <div className="flex flex-col mb-5">
+              <label htmlFor="task-title">タスク名</label>
               <input
-                id="task-due-date"
-                type="date"
+                id="task-title"
+                type="text"
                 readOnly={isView}
-                className="border-2 border-gray-800 bg-white p-4 rounded h-10 flex"
-                value={due_date}
-                onChange={(e) => setDueDate(e.target.value)}
+                className="border-2 border-gray-200 bg-white p-4 rounded h-10 mb-5"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
-              {errors.due_date && (
-                <p className="text-red-600 text-sm mt-1">{errors.due_date}</p>
+              {errors.title && (
+                <p className="text-red-600 text-sm mt-1">{errors.title}</p>
+              )}
+              <label htmlFor="task-description">詳細説明</label>
+              <textarea
+                id="task-description"
+                rows={4}
+                readOnly={isView}
+                className="border-2 border-gray-200 bg-white p-4 rounded"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+              {errors.description && (
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.description}
+                </p>
               )}
             </div>
-            <div className="justify-between">
-              <label htmlFor="task-user-id">担当者</label>
-              <select
-                name=""
-                id="task-user-id"
-                value={user_id}
-                disabled={isView}
-                onChange={(e) => setUserId(Number(e.target.value))}
-                className="flex"
-              >
-                <option value="1">田中</option>
-                <option value="2">佐藤</option>
-                <option value="3">山田</option>
-              </select>
+            <div className="grid grid-cols-1 gap-4 border-b border-gray-200 mb-5 sm:grid-cols-4 ">
+              <div className="flex flex-col">
+                <label htmlFor="status">ステータス</label>
+                <select
+                  name=""
+                  id=""
+                  value={status}
+                  disabled={isView}
+                  onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                  className="border border-gray-200 rounded w-23 px-3 py-2"
+                >
+                  <option value="未着手">未着手</option>
+                  <option value="対応中">対応中</option>
+                  <option value="完了">完了</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="task-priority">優先度</label>
+                <select
+                  id="task-priority"
+                  value={priority}
+                  disabled={isView}
+                  onChange={(e) => setPriority(e.target.value as TaskPriority)}
+                  className="flex border border-gray-200 w-23 px-3 py-2 rounded"
+                >
+                  <option value="高">高</option>
+                  <option value="中">中</option>
+                  <option value="低">低</option>
+                </select>
+              </div>
+              <div className="">
+                <label htmlFor="task-due-date">期限</label>
+                <input
+                  id="task-due-date"
+                  type="date"
+                  readOnly={isView}
+                  className="border border-gray-200 bg-white p-4 rounded h-10 flex"
+                  value={due_date}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
+                {errors.due_date && (
+                  <p className="text-red-600 text-sm mt-1">{errors.due_date}</p>
+                )}
+              </div>
+              <div className="justify-between">
+                <label htmlFor="task-user-id">担当者</label>
+                <select
+                  name=""
+                  id="task-user-id"
+                  value={user_id}
+                  disabled={isView}
+                  onChange={(e) => setUserId(Number(e.target.value))}
+                  className="flex"
+                >
+                  <option value="1">田中</option>
+                  <option value="2">佐藤</option>
+                  <option value="3">山田</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="task-ispublic">公開設定</label>
+                <input
+                  type="radio"
+                  name="公開設定"
+                  id="task-ispublic-public"
+                  disabled={isView}
+                  value="public"
+                  checked={ispublic === "public"}
+                  onChange={(e) => setPublic(e.target.value)}
+                />
+                <label htmlFor="task-ispublic-public">公開</label>
+                <input
+                  type="radio"
+                  name="公開設定"
+                  id="task-ispublic-private"
+                  disabled={isView}
+                  value="private"
+                  checked={ispublic === "private"}
+                  onChange={(e) => setPublic(e.target.value)}
+                />
+                <label htmlFor="task-ispublic-private">非公開</label>
+              </div>
             </div>
-            <div>
-              <label htmlFor="task-ispublic">公開設定</label>
-              <input
-                type="radio"
-                name="公開設定"
-                id="task-ispublic-public"
-                disabled={isView}
-                value="public"
-                checked={ispublic === "public"}
-                onChange={(e) => setPublic(e.target.value)}
-              />
-              <label htmlFor="task-ispublic-public">公開</label>
-              <input
-                type="radio"
-                name="公開設定"
-                id="task-ispublic-private"
-                disabled={isView}
-                value="private"
-                checked={ispublic === "private"}
-                onChange={(e) => setPublic(e.target.value)}
-              />
-              <label htmlFor="task-ispublic-private">非公開</label>
-            </div>
-          </div>
-          <div>
-            {isEdit && task && (
-              <button type="button" onClick={handleDelete}>
-                削除
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onClose || (() => router.push("/tasks"))}
-            >
-              キャンセル
-            </button>
-          </div>
-          <button>{isCreate ? "作成" : "保存"}</button>
-        </form>
-      ) : (
-        <>
-          <div className="px-10 py-6 space-y-6">
-            <div className="flex justify-between border-b border-gray-200">
-              <h1 className="text-xl font-semibold text-gray-900 mb-4">
-                {title}
-              </h1>
-              <div className="ml-4 flex items-center gap-2">
+            <div className="flex justify-between items-center">
+              {isEdit && task ? (
                 <button
                   type="button"
-                  onClick={() => setCurrentMode("edit")}
-                  className="border border-gray-200 rounded px-3 py-1 mr-2"
+                  onClick={handleDelete}
+                  className="text-red-300 flex hover:bg-red-100 rounded px-2 py-1"
                 >
-                  編集
+                  <Trash2 className="text-red-300" />
+                  削除
+                </button>
+              ) : (
+                <div />
+              )}
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={onClose || (() => router.push("/tasks"))}
+                  className="border border-gray-300 rounded px-4 py-2 hover:bg-gray-50"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
+                >
+                  {isCreate ? "作成" : "保存"}
                 </button>
               </div>
             </div>
-            <div>
-              <h2 className="text-sm font-medium text-gray-500 mb-1">
-                詳細説明
-              </h2>
-              <p className="text-gray-900">
-                {description || "説明がありません"}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg mb-4 border border-gray-200 ">
+          </form>
+        ) : (
+          <>
+            <div className="px-10 py-6">
+              <div className="flex justify-between border-b border-gray-200">
+                <h1 className="text-xl font-semibold text-gray-900 mb-4">
+                  {title}
+                </h1>
+                <div className="ml-4 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentMode("edit")}
+                    className="border border-gray-200 rounded px-3 py-1 mr-2"
+                  >
+                    編集
+                  </button>
+                </div>
+              </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">
-                  ステータス
+                <h2 className="text-sm font-medium text-gray-500 mt-5">
+                  詳細説明
+                </h2>
+                <p className="text-gray-900">
+                  {description || "説明がありません"}
                 </p>
-                <StatusBadge status={status} />
               </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">優先度</p>
-                <p className="text-sm">{priority}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg mb-4 border border-gray-200 ">
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    ステータス
+                  </p>
+                  <StatusBadge status={status} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    優先度
+                  </p>
+                  <p className="text-sm">{priority}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500">期限</p>
+                  <p>{due_date}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    担当者
+                  </p>
+                  <p>{task?.user_name}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500">期限</p>
-                <p>{due_date}</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">担当者</p>
-                <p>{task?.user_name}</p>
+
+              <div className="text-xs text-gray-500 border-t border-gray-200 pt-4 mb-4">
+                <span>作成日:{formatDateOnly(task?.created_at)}</span>
+                <span className="mx-2">|</span>
+                <span>最終更新:{formatDateOnly(task?.updated_at)}</span>
+                <span className="mx-2">|</span>
+                <span>作成者:{task?.created_name}</span>
               </div>
             </div>
 
-            <div className="text-xs text-gray-500 border-t border-gray-200 pt-4 mb-4">
-              <span>作成日:{formatDateOnly(task?.created_at)}</span>
-              <span className="mx-2">|</span>
-              <span>最終更新:{formatDateOnly(task?.updated_at)}</span>
-              <span className="mx-2">|</span>
-              <span>作成者:{task?.created_name}</span>
-            </div>
-          </div>
-
-          {/* <button
+            {/* <button
               type="button"
               onClick={handleDelete}
               className="bg-red-500 text-white p-2 rounded h-10"
@@ -302,8 +333,9 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
             >
               閉じる
             </button> */}
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

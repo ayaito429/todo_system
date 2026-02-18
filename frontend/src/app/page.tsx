@@ -1,65 +1,107 @@
-import Image from "next/image";
+"use client";
+import { login } from "@/src/lib/api/auth";
+import { setAuthCookie } from "@/src/lib/cookie";
+import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLodaing] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setError("");
+    setLodaing(true);
+    try {
+      const data = await login(email, password);
+      localStorage.setItem("access_token", data.access_token);
+      setAuthCookie(data.access_token);
+      router.push("/tasks");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "ログインに失敗しました");
+    } finally {
+      setLodaing(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="flex flex-col items-center">
+          <svg
+            width="60"
+            height="60"
+            viewBox="0 0 100 100"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            <circle cx="50" cy="50" r="48" stroke="#1F2937" strokeWidth="4" />
+            <path
+              d="M30 35H70M50 35V75M40 65L48 73L75 45"
+              stroke="#3B82F6"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </svg>
+
+          <h1 className="text-2xl font-bold mt-5">Task Flow</h1>
+          {error && <p className="text-red-600 text-sm">{error}</p>}
         </div>
-      </main>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="">
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="">メールアドレス</label>
+              <input
+                type="email"
+                className="border border-gray-200 rounded-md h-10"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="">パスワード</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="border border-gray-200 rounded-md h-10 w-full"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-500 w-full text-white border rounded-lg h-10"
+          >
+            {loading ? "ログイン中..." : "ログイン"}
+          </button>
+        </form>
+        <p className="flex justify-center">
+          アカウントをお持ちでない方は{" "}
+          <Link href="/signup" className="text-blue-500 hover:underline">
+            新規登録
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
