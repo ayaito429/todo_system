@@ -6,7 +6,7 @@ export function setAuthCookie(token: string): void {
   if (typeof document === "undefined") return;
   document.cookie = `${COOKIE_NAME}=${encodeURIComponent(
     token,
-  )}; path=/; max-age=${MAX_AGE}; SameSite=Lax; HttpOnly; Secure`;
+  )}; path=/; max-age=${MAX_AGE}; SameSite=Lax; window.location.protocol === Secure`;
 }
 
 //トークン用Cookieを削除

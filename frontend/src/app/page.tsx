@@ -1,10 +1,11 @@
 "use client";
-import { login } from "@/src/lib/api/auth";
+import { getMe, login } from "@/src/lib/api/auth";
 import { setAuthCookie } from "@/src/lib/cookie";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUser } from "../contexts/UserContext";
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +14,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { setUser } = useUser();
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -22,6 +24,9 @@ export default function Home() {
       const data = await login(email, password);
       localStorage.setItem("access_token", data.access_token);
       setAuthCookie(data.access_token);
+
+      const user = await getMe(data.access_token);
+      setUser(user);
       router.push("/tasks");
     } catch (err) {
       setError(err instanceof Error ? err.message : "ログインに失敗しました");
