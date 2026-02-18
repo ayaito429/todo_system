@@ -1,1 +1,50 @@
-# ユーザーサービス（TODO: 実装）
+from datetime import datetime, timezone
+from sqlalchemy.orm import Session
+
+from core.exceptions import AppException
+from db.models import User
+from repositories import user_repository
+from schemas.user import UserCreate, UserResponse
+from core.security import get_password_hash
+
+
+def create_user(db: Session, user_in: UserCreate) -> UserResponse:
+    """
+    ユーザー新規作成。
+    """
+
+    # パスワードをハッシュ化
+    hashed_password = get_password_hash(user_in.password)
+    user = User(
+        name=user_in.name,
+        email=user_in.email,
+        password=hashed_password,
+        role=user_in.role,
+        team_id=user_in.team_id,
+        deleted_flag=False,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    # 既に登録されているユーザーか確認
+    existing = user_repository.find_by_email(db, user.email)
+    if existing:
+        if existing.deleted_flag:
+            user = user_repository.update_for_reregister(db, existing, user)
+        else:
+            raise AppException(
+                status_code=409,
+                error_code="EMAIL_ALREADY_REGISTERED",
+                message="このメールアドレスは既に登録されています。",
+            )
+    else:
+        user = user_repository.save(db, user)
+
+    return UserResponse(
+        id=user.id,
+        name=user.name,
+        email=user.email,
+        role=user.role,
+        team_id=user.team_id,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+    )

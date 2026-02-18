@@ -51,7 +51,13 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
 
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 @router.get("/me")
 def read_me(current_user: User = Depends(get_current_user)):
     """ログイン中ユーザーの情報を返す。"""
-    return {"user_id": current_user.id, "email": current_user.email, "role": current_user.role}
+    return {
+        "user_id": current_user.id,
+        "email": current_user.email,
+        "role": current_user.role,
+        "name": current_user.name,
+    }
