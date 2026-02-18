@@ -13,9 +13,7 @@ def create_user(db: Session, user_in: UserCreate) -> UserResponse:
     ユーザー新規作成。
     """
 
-    """
-    パスワードをハッシュ化
-    """
+    # パスワードをハッシュ化
     hashed_password = get_password_hash(user_in.password)
     user = User(
         name=user_in.name,
@@ -27,14 +25,11 @@ def create_user(db: Session, user_in: UserCreate) -> UserResponse:
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
     )
-    """
-    既に登録されているユーザーか確認
-    """
+    # 既に登録されているユーザーか確認
     existing = user_repository.find_by_email(db, user.email)
-    print("existing:", existing)
-    if existing != None:
-        if existing.deleted_flag is True:
-            user = user_repository.update_for_reregister(db, user)
+    if existing:
+        if existing.deleted_flag:
+            user = user_repository.update_for_reregister(db, existing, user)
         else:
             raise AppException(
                 status_code=409,
