@@ -11,3 +11,11 @@ class LoginRequest(BaseModel):
     email: str = Field(...)
     # 平文パスワード（サーバー側でハッシュと照合する）
     password: str = Field(...)
+
+
+class ChangePasswordRequest(BaseModel):
+    """
+    パスワード変更のリクエストボディ
+    """
+
+    new_password: str

@@ -13,22 +13,12 @@ def create_user(db: Session, user_in: UserCreate) -> UserResponse:
     ユーザー新規作成。
     """
 
-    # パスワードをハッシュ化
-    hashed_password = get_password_hash(user_in.password)
-    user = User(
-        name=user_in.name,
-        email=user_in.email,
-        password=hashed_password,
-        role=user_in.role,
-        team_id=user_in.team_id,
-        deleted_flag=False,
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
-    )
     # 既に登録されているユーザーか確認
     existing = user_repository.find_by_email(db, user.email)
+
     if existing:
         if existing.deleted_flag:
+            # 再登録（復活＋情報更新）
             user = user_repository.update_for_reregister(db, existing, user)
         else:
             raise AppException(
@@ -37,6 +27,19 @@ def create_user(db: Session, user_in: UserCreate) -> UserResponse:
                 message="このメールアドレスは既に登録されています。",
             )
     else:
+        # パスワードをハッシュ化
+        hashed_password = get_password_hash(user_in.password)
+        user = User(
+            name=user_in.name,
+            email=user_in.email,
+            password=hashed_password,
+            role=user_in.role,
+            team_id=user_in.team_id,
+            deleted_flag=False,
+            is_first_login=True,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+        )
         user = user_repository.save(db, user)
 
     return UserResponse(
