@@ -19,6 +19,8 @@ class User(Base):
     role = Column(String, nullable=False)
     # チームID
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
+    # 初回ログイン判定
+    is_first_login = Column(Boolean, nullable=False, default=True)
     # 作成日時
     created_at = Column(DateTime, default=datetime.now)
     # 更新日時

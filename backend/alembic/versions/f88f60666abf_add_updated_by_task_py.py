@@ -23,7 +23,7 @@ def upgrade() -> None:
     
     op.add_column(
         "tasks",
-        sa.Column("updated_by", sa.Integer(), nullable=False, server_default="1"),
+        sa.Column("updated_by", sa.Integer(), nullable=False),
     )
     op.create_foreign_key(
         "fk_tasks_updated_by_users",

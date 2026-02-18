@@ -28,8 +28,8 @@ def upgrade() -> None:
     sa.Column('status', sa.String(), nullable=False),
     sa.Column('priority', sa.Integer(), nullable=False),
     sa.Column('due_date', sa.DateTime(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
-    sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('deleted_flag', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )

@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from repositories import user_repository
 from core.dependencies import get_current_user
 from core.exceptions import AppException
 from core.security import create_access_token, verify_password
 from db.models import User
 from db.session import get_db
-from schemas.auth import LoginRequest
+from schemas.auth import ChangePasswordRequest, LoginRequest
 
 # ログイン関連 API（/auth）
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -18,23 +19,11 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     メールとパスワードで認証し、JWT アクセストークンを返す。
     失敗時は 401 とし、ユーザー不在とパスワード不一致は同じメッセージで返す（列挙攻撃対策）。
     """
-    # メールでユーザーを1件取得（削除済みは除外）
-    user = (
-        db.query(User)
-        .filter(User.email == login_data.email)
-        .filter(User.deleted_flag == False)
-        .first()
-    )
-
-    if not user:
-        raise AppException(
-            status_code=401,
-            error_code="USER_NOT_FOUND",
-            message="ユーザーが存在しません",
-        )
+    # メールでユーザーを1件取得
+    login_user = user_repository.find_by_email(db, login_data.email)
 
     # 平文パスワードとDBのハッシュを照合
-    if not verify_password(login_data.password, user.password):
+    if not verify_password(login_data.password, login_user.password):
         raise AppException(
             status_code=401,
             error_code="USER_NOT_FOUND",
@@ -44,12 +33,16 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     # JWT に sub（ユーザーID）と role を入れ、アクセストークンを発行
     access_token = create_access_token(
         data={
-            "sub": str(user.id),
-            "role": user.role,
+            "sub": str(login_user.id),
+            "role": login_user.role,
         }
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "require_password_change": login_user.is_first_login,
+    }
 
 
 @router.get("/me")
@@ -61,3 +54,18 @@ def read_me(current_user: User = Depends(get_current_user)):
         "role": current_user.role,
         "name": current_user.name,
     }
+
+
+@router.post("/first-login/password")
+def change_password_first_time(
+    payload: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    初回ログイン時はパスワードを変更する
+    """
+
+    return user_repository.change_password_first_time(
+        db, current_user, payload.new_password
+    )
