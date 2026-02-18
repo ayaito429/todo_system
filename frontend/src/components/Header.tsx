@@ -2,8 +2,10 @@
 import { LogIn } from "lucide-react";
 import Link from "next/link";
 import { logout } from "../lib/auth";
+import { useUser } from "../contexts/UserContext";
 
 export function Header() {
+  const user = useUser();
   return (
     <header className="bg-white h-16 flex px-30">
       <div className="flex justify-between w-full items-center">
@@ -29,8 +31,14 @@ export function Header() {
           </div>
         </Link>
         <div className="flex space-x-5">
-          <span>ユーザー名</span>
-          <button onClick={() => logout()}>
+          <span>{user.user?.name}</span>
+          <button
+            onClick={() => {
+              if (!window.confirm("ログアウトしますか？")) return;
+
+              logout();
+            }}
+          >
             <LogIn />
           </button>
         </div>

@@ -96,7 +96,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
 
   const handleDelete = async () => {
     if (!task?.id) return;
-    if (!window.confirm("今タスクを削除しますか？")) return;
+    if (!window.confirm("タスクを削除しますか？")) return;
     try {
       await deleteTask(task?.id);
       router.push("/tasks");
@@ -117,7 +117,13 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
       </button>
       <div className="border rounded-lg px-10 py-6 bg-white">
         {isFormMode ? (
-          <form action="">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (isCreate) handleCreate();
+              else handleUpdate();
+            }}
+          >
             <div className="flex flex-col mb-5">
               <label htmlFor="task-title">タスク名</label>
               <input
