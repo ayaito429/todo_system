@@ -1,3 +1,4 @@
+from typing import List
 from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
@@ -64,3 +65,23 @@ def change_password_first_time(db: Session, user: User, new_password: str) -> di
     db.refresh(user)
 
     return {"message": "パスワードを変更しました"}
+
+
+def get_all_leaders(db: Session) -> List[User]:
+    """
+    全てのリーダー情報を取得
+    """
+    return db.query(User).filter(User.role == 'leader').order_by(User.name).all()
+
+
+def get_team_users(db: Session, team_id: int) -> List[User]:
+    """
+    指定したチームの全てのユーザーを取得
+    """
+    return (
+        db.query(User)
+        .filter(User.team_id == team_id)
+        .filter(User.deleted_flag == False)
+        .order_by(User.name)
+        .all()
+    )

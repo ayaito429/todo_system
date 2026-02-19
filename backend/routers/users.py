@@ -1,4 +1,5 @@
 # ユーザー関連 API（/api/users）
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -21,3 +22,13 @@ def create_user(
     ユーザーを新規作成。
     """
     return user_service.create_user(db=db, user_in=user_in)
+
+
+@router.get("", response_model=List[UserResponse])
+def get_user(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    """
+    ユーザーを取得。
+    """
+    return user_service.get_user(db=db, login_user=current_user)
