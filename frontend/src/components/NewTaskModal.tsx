@@ -6,6 +6,7 @@ import { createTask, deleteTask, updateTask } from "@/src/lib/api/tasks";
 import { Task, TaskPriority, TaskStatus } from "../types/task";
 import StatusBadge from "./StatusBadge";
 import { ArrowLeft, Trash2 } from "lucide-react";
+import { useUser } from "../contexts/UserContext";
 
 type Props = {
   task?: Task;
@@ -24,7 +25,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
   const [priority, setPriority] = useState<TaskPriority>(
     task?.priority || "高",
   );
-  const [user_id, setUserId] = useState(1);
+  const [user_id, setUserId] = useState(8);
   const [status, setStatus] = useState<TaskStatus>(task?.status || "未着手");
   const [ispublic, setPublic] = useState("");
   const [currentMode, setCurrentMode] = useState<"create" | "view" | "edit">(
@@ -45,6 +46,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
     description?: string;
     due_date?: string;
   }>({});
+  const user = useUser();
 
   const validateCreate = (): boolean => {
     const next: { title?: string; description?: string; due_date?: string } =
@@ -66,7 +68,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
         priority: priority,
         due_date: due_date,
         user_id: user_id,
-        login_user: 1,
+        login_user: user.user?.user_id ?? 0,
         //  ispublic: ispublic,
       });
 
