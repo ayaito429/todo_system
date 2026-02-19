@@ -37,6 +37,8 @@ export function ProgressChart({ todo, inProgress, done }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-6 rounded-lg border bg-white p-4 justify-center mb-10">
+      <span className="text-lg">進捗率</span>
+
       <div className="relative h-32 w-32 flex-shrink-0">
         <div
           className="h-full w-full rounded-full"

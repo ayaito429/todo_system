@@ -14,7 +14,7 @@ def create_user(db: Session, user_in: UserCreate) -> UserResponse:
     """
 
     # 既に登録されているユーザーか確認
-    existing = user_repository.find_by_email(db, user.email)
+    existing = user_repository.find_by_email(db, user_in.email)
 
     if existing:
         if existing.deleted_flag:

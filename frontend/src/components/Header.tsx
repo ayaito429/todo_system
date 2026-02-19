@@ -1,5 +1,5 @@
 "use client";
-import { LogIn } from "lucide-react";
+import { CircleUserRound, LogIn } from "lucide-react";
 import Link from "next/link";
 import { logout } from "../lib/auth";
 import { useUser } from "../contexts/UserContext";
@@ -30,8 +30,12 @@ export function Header() {
             <span className="font-bold">Task Flow</span>
           </div>
         </Link>
-        <div className="flex space-x-5">
-          <span>{user.user?.name}</span>
+
+        <div className="flex">
+          <div className="flex pr-5">
+            <CircleUserRound />
+            <span>{user.user?.name}</span>
+          </div>
           <button
             onClick={() => {
               if (!window.confirm("ログアウトしますか？")) return;
