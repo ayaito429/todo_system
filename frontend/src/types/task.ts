@@ -16,6 +16,8 @@ export type Task = {
   created_by: string;
   created_name: string;
   updated_at: string;
+  updated_name?: string;
+
   deleted_at?: string;
 };
 

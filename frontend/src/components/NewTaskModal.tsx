@@ -27,18 +27,15 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
   );
   const [user_id, setUserId] = useState(8);
   const [status, setStatus] = useState<TaskStatus>(task?.status || "未着手");
-  const [ispublic, setPublic] = useState("");
   const [currentMode, setCurrentMode] = useState<"create" | "view" | "edit">(
     mode ?? (task ? "view" : "create"),
   );
-  // const [created_by,setCreatedBy] = useState("");
-  // const [updated_by,setUpdatedBy] = useState("");
+
   const router = useRouter();
   const isView = currentMode === "view";
   const isEdit = currentMode === "edit";
   const isCreate = currentMode === "create";
 
-  const isReadOnly = isView;
   const isFormMode = isCreate || isEdit;
 
   const [errors, setErrors] = useState<{
@@ -46,7 +43,16 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
     description?: string;
     due_date?: string;
   }>({});
-  const user = useUser();
+  const { user } = useUser();
+
+  const canDelete =
+    user != null && (user.role === "admin" || user.role === "leader");
+
+  const canEdit =
+    user != null &&
+    (user.role === "admin" ||
+      user.role === "leader" ||
+      (user.role === "user" && task != null && task.user_id === user.user_id));
 
   const validateCreate = (): boolean => {
     const next: { title?: string; description?: string; due_date?: string } =
@@ -68,7 +74,7 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
         priority: priority,
         due_date: due_date,
         user_id: user_id,
-        login_user: user.user?.user_id ?? 0,
+        login_user: user?.user_id ?? 0,
         //  ispublic: ispublic,
       });
 
@@ -213,32 +219,9 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
                   <option value="3">山田</option>
                 </select>
               </div>
-              <div>
-                <label htmlFor="task-ispublic">公開設定</label>
-                <input
-                  type="radio"
-                  name="公開設定"
-                  id="task-ispublic-public"
-                  disabled={isView}
-                  value="public"
-                  checked={ispublic === "public"}
-                  onChange={(e) => setPublic(e.target.value)}
-                />
-                <label htmlFor="task-ispublic-public">公開</label>
-                <input
-                  type="radio"
-                  name="公開設定"
-                  id="task-ispublic-private"
-                  disabled={isView}
-                  value="private"
-                  checked={ispublic === "private"}
-                  onChange={(e) => setPublic(e.target.value)}
-                />
-                <label htmlFor="task-ispublic-private">非公開</label>
-              </div>
             </div>
             <div className="flex justify-between items-center">
-              {isEdit && task ? (
+              {isEdit && task && canDelete ? (
                 <button
                   type="button"
                   onClick={handleDelete}
@@ -274,14 +257,17 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
                 <h1 className="text-xl font-semibold text-gray-900 mb-4">
                   {title}
                 </h1>
+
                 <div className="ml-4 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentMode("edit")}
-                    className="border border-gray-200 rounded px-3 py-1 mr-2"
-                  >
-                    編集
-                  </button>
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentMode("edit")}
+                      className="border border-gray-200 rounded px-3 py-1 mr-2"
+                    >
+                      編集
+                    </button>
+                  )}
                 </div>
               </div>
               <div>
@@ -323,24 +309,10 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
                 <span>最終更新:{formatDateOnly(task?.updated_at)}</span>
                 <span className="mx-2">|</span>
                 <span>作成者:{task?.created_name}</span>
+                <span className="mx-2">|</span>
+                <span>更新者:{task?.updated_name}</span>
               </div>
             </div>
-
-            {/* <button
-              type="button"
-              onClick={handleDelete}
-              className="bg-red-500 text-white p-2 rounded h-10"
-              >
-              削除
-            </button>
-
-            <button
-              type="button"
-              onClick={onClose || (() => router.push("/tasks"))}
-              className="bg-green-500 text-white p-2 rounded h-10"
-            >
-              閉じる
-            </button> */}
           </>
         )}
       </div>

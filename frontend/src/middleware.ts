@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // 認証チェックを行うパスだけに限定（/login では実行しない）
 export const config = {
-  matcher: ["/tasks", "/tasks/:path*"],
+  matcher: ["/tasks", "/tasks/:path*", "/addmember"],
 };
 
 export function middleware(request: NextRequest) {
