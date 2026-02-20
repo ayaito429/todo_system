@@ -1,4 +1,7 @@
 from typing import List
+
+from typing import Optional
+
 from pydantic import BaseModel, Field
 from datetime import date, datetime
 
@@ -109,3 +112,14 @@ class TaskInitResponse(BaseModel):
     total_counts: int
     # ユーザー一覧（プルダウン表示用）
     users: List[UserResponse]
+
+
+class AdminTeamTasks(BaseModel):
+    """
+    管理者画面 初期表示APIレスポンス
+    """
+
+    id: int
+    title: str
+    status: str
+    due_date: Optional[date]
