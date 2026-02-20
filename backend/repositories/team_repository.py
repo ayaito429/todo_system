@@ -1,4 +1,4 @@
-from typing import Counter
+from collections import Counter
 from sqlalchemy.orm import Session, selectinload
 
 
@@ -17,7 +17,7 @@ def get_team_name(db: Session, team_id: int) -> str:
     )
 
 
-def get_team_and_task(db: Session):
+def get_team_and_task(db: Session) -> list:
     """
     各チームの全てのタスクを取得
     """
