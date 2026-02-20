@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/src/components/Header";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createUser } from "@/src/lib/api/user";
 import { Role } from "@/src/types/user";
+import { useUser } from "@/src/contexts/UserContext";
 
 export default function AddMember() {
   const [userName, setUserName] = useState("");
@@ -14,6 +15,15 @@ export default function AddMember() {
   const [role, setRole] = useState<Role>("user");
   const [teamId, setTeamId] = useState("");
   const router = useRouter();
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user === null) return;
+
+    if (user.role !== "admin") {
+      router.replace("/tasks");
+    }
+  }, [user, router]);
 
   const handleCreate = async () => {
     try {

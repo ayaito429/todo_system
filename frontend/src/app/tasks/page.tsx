@@ -60,7 +60,7 @@ export default function TaskListPage() {
           className="border border-gray-200 rounded-md p-2 bg-blue-500 text-white w-30 flex justify-center w-40"
         >
           <FilePlusCorner />
-          新規作成
+          タスク新規作成
         </Link>
       </header>
       <ProgressChart
