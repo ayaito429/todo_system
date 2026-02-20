@@ -21,6 +21,8 @@ class Task(Base):
     due_date = Column(DateTime, nullable=False)
     # 担当ユーザーID
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # チームID
+    team_id = Column(Integer, ForeignKey("teams.id"), nullable=False)
     # 作成者ID
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     # 更新者ID
@@ -49,4 +51,9 @@ class Task(Base):
         "User",
         foreign_keys=[updated_by],
         back_populates="updated_tasks",
+    )
+    # チームID
+    team = relationship(
+        "Team",
+        back_populates="tasks",
     )
