@@ -1,9 +1,14 @@
+from typing import List
 from pydantic import BaseModel, Field
 from datetime import date, datetime
 
+from schemas.user import UserResponse
+
 
 class TaskCreate(BaseModel):
-    """タスク新規作成用（API リクエストボディ）"""
+    """
+    タスク新規作成用（API リクエストボディ）
+    """
 
     # タスク名
     title: str = Field(..., min_length=1, max_length=100)
@@ -21,7 +26,7 @@ class TaskCreate(BaseModel):
 
 class TaskResponse(BaseModel):
     """
-    新規作成したタスク情報を返却するレスポンスモデル
+    タスク情報を返却するレスポンスモデル
     """
 
     # タスクID
@@ -59,7 +64,7 @@ class TaskResponse(BaseModel):
 
 class TaskUpdate(BaseModel):
     """
-    タスク更新用（API リクエストボディ）
+    タスク更新用 リクエストボディ
     """
 
     # タイトル
@@ -74,3 +79,33 @@ class TaskUpdate(BaseModel):
     status: str | None
     # 担当ユーザー
     user_id: int | None
+
+
+class StatusCounts(BaseModel):
+    """
+    ステータスごとの件数
+    """
+
+    # ステータス：未対応
+    todo: int
+    # ステータス：対応中
+    in_progress: int
+    # ステータス：完了
+    done: int
+
+
+class TaskInitResponse(BaseModel):
+    """
+    初期表示 レスポンスモデル
+    """
+
+    # タスク一覧
+    tasks: List[TaskResponse]
+    # チーム名
+    team_name: str
+    # ステータスごとのタスク件数
+    status_counts: StatusCounts
+    # タスク総件数
+    total_counts: int
+    # ユーザー一覧（プルダウン表示用）
+    users: List[UserResponse]

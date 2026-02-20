@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from core.dependencies import get_current_user
 from db.session import get_db
 from db.models.user import User
-from schemas.task import TaskCreate, TaskResponse, TaskUpdate
+from schemas.task import TaskCreate, TaskInitResponse, TaskResponse, TaskUpdate
 from services import task_service
 
 # タスク関連 API（/api/tasks）
@@ -28,11 +28,11 @@ def create_task(
     return task_service.create_task(db=db, task_in=task_in)
 
 
-@router.get("", response_model=List[TaskResponse])
-def list_tasks(
+@router.get("", response_model=TaskInitResponse)
+def init_info(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> List[TaskResponse]:
+) -> TaskInitResponse:
     """
     タスク一覧を取得。
     admin の場合は全件、それ以外は自チームのタスクのみ返す。認証必須。

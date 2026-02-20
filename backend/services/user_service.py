@@ -1,3 +1,4 @@
+from typing import List
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
@@ -51,3 +52,14 @@ def create_user(db: Session, user_in: UserCreate) -> UserResponse:
         created_at=user.created_at,
         updated_at=user.updated_at,
     )
+
+
+def get_user(db: Session, login_user: User) -> List[UserResponse]:
+
+    if login_user.role == "admin":
+        users = user_repository.get_all_leaders(db)
+    elif login_user.role == "leader":
+        users = user_repository.get_team_users(db, login_user.team_id)
+    else:
+        users = []
+    return users

@@ -1,7 +1,9 @@
 # タスク DB アクセス
 from datetime import datetime, timezone
 from typing import List
+from unittest import result
 
+from sqlalchemy import func, case
 from sqlalchemy.orm import Session, joinedload
 
 from db.models.task import Task
@@ -39,6 +41,9 @@ def get_by_id(db: Session, task_id: int) -> Task | None:
 
 
 def get_all(db) -> List[Task]:
+    """
+    削除されていない全てのタスクを取得（admin用）
+    """
     return (
         db.query(Task)
         .options(
@@ -52,6 +57,9 @@ def get_all(db) -> List[Task]:
 
 
 def get_by_team(db, team_id) -> List[Task]:
+    """
+    指定したチームの全てのタスクを取得
+    """
     return (
         db.query(Task)
         .options(
@@ -61,11 +69,10 @@ def get_by_team(db, team_id) -> List[Task]:
         )
         .join(User, Task.user_id == User.id)
         .filter(User.team_id == team_id)
-        .filter(User.role != 'admin')
+        .filter(User.role != "admin")
         .filter(Task.deleted_flag == False)
         .all()
     )
-    
 
 
 def update(db: Session, task_id: int, update_task: TaskUpdate) -> Task | None:
@@ -127,3 +134,27 @@ def delete(db: Session, task_id: int) -> bool:
     except SQLAlchemyError:
         db.rollback()
         raise
+
+
+def get_status_counts(db: Session, team_id: int):
+    """
+    指定されたチームIDのタスクについて、ステータス毎の件数を取得します。
+    """
+    result = (
+        db.query(
+            func.sum(case((Task.status == "未対応", 1), else_=0)).label("todo"),
+            func.sum(case((Task.status == "対応中", 1), else_=0)).label("inProgress"),
+            func.sum(case((Task.status == "完了", 1), else_=0)).label("done"),
+        )
+        .join(User, Task.user_id == User.id)
+        .filter(Task.deleted_flag.is_(False))
+        .filter(User.team_id == team_id)
+        .filter(User.role != "admin")
+        .one()
+    )
+
+    return {
+        "todo": result.todo or 0,
+        "inProgress": result.inProgress or 0,
+        "done": result.done or 0,
+    }
