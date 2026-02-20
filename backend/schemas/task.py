@@ -86,11 +86,11 @@ class StatusCounts(BaseModel):
     ステータスごとの件数
     """
 
-    # ステータス：高
+    # ステータス：未対応
     todo: int
-    # ステータス：中
-    inProgress: int
-    # ステータス：低
+    # ステータス：対応中
+    in_progress: int
+    # ステータス：完了
     done: int
 
 

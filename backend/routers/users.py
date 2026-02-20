@@ -27,8 +27,8 @@ def create_user(
 @router.get("", response_model=List[UserResponse])
 def get_user(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
-):
+)-> List[UserResponse]:
     """
-    ユーザーを取得。
+    ログインユーザーの権限に応じてユーザー一覧を取得。
     """
     return user_service.get_user(db=db, login_user=current_user)

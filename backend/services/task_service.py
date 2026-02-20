@@ -12,7 +12,6 @@ from schemas.task import (
 )
 from repositories import task_repository
 from datetime import datetime, timezone
-from typing import List
 
 
 def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
@@ -64,7 +63,7 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
     )
 
 
-def get_all_tasks(db, user_role, team_id) -> TaskInitResponse:
+def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitResponse:
     """
     初期表示情報取得
     """
@@ -73,6 +72,7 @@ def get_all_tasks(db, user_role, team_id) -> TaskInitResponse:
         users = user_repository.get_all_leaders(db)
     elif team_id is None:
         tasks = []
+        users = []
     else:
         tasks = task_repository.get_by_team(db, team_id)
         users = user_repository.get_team_users(db, team_id)
@@ -100,19 +100,12 @@ def get_all_tasks(db, user_role, team_id) -> TaskInitResponse:
     # ユーザー一覧
     user_response = [
         UserResponse(
-            # ユーザーID
             id=user.id,
-            # ユーザー名
             name=user.name,
-            # メールアドレス
             email=user.email,
-            # 権限
             role=user.role,
-            # 所属チーム
             team_id=user.team_id,
-            # 作成日時
             created_at=user.created_at,
-            # 更新日時
             updated_at=user.updated_at,
         )
         for user in users

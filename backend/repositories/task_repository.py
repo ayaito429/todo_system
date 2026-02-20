@@ -69,7 +69,7 @@ def get_by_team(db, team_id) -> List[Task]:
         )
         .join(User, Task.user_id == User.id)
         .filter(User.team_id == team_id)
-        .filter(User.role != 'admin')
+        .filter(User.role != "admin")
         .filter(Task.deleted_flag == False)
         .all()
     )
@@ -137,12 +137,14 @@ def delete(db: Session, task_id: int) -> bool:
 
 
 def get_status_counts(db: Session, team_id: int):
-    """ """
+    """
+    指定されたチームIDのタスクについて、ステータス毎の件数を取得します。
+    """
     result = (
         db.query(
-            func.sum(case((Task.status == '未対応', 1), else_=0)).label("todo"),
-            func.sum(case((Task.status == '対応中', 1), else_=0)).label("inProgress"),
-            func.sum(case((Task.status == '完了', 1), else_=0)).label("done"),
+            func.sum(case((Task.status == "未対応", 1), else_=0)).label("todo"),
+            func.sum(case((Task.status == "対応中", 1), else_=0)).label("inProgress"),
+            func.sum(case((Task.status == "完了", 1), else_=0)).label("done"),
         )
         .join(User, Task.user_id == User.id)
         .filter(Task.deleted_flag.is_(False))
