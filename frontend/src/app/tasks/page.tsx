@@ -12,10 +12,25 @@ import { getTeamTasks } from "@/src/lib/api/teams";
 
 const PAGE_SIZE = 8;
 
+type StatusCounts = {
+  todo: number;
+  done: number;
+in_progress: number
+
+}
+  type TeamStat = {
+    id: number;
+    team_name: string;
+    status_counts: StatusCounts
+    all_counts: number
+    // tasks: List[AdminTeamTasks]
+  }
+
 export default function TaskListPage() {
   const { tasks, setTasks, team_name, setTeamName, users, setUsers } =
     useTaskList();
   const [currentPage, setCurrentPage] = useState(1);
+  const [teamStats, setTeamStats] = useState<TeamStat[]>([])
 
   const totalPages = Math.ceil(tasks.length / PAGE_SIZE) || 1;
   const start = (currentPage - 1) * PAGE_SIZE;
@@ -38,19 +53,19 @@ export default function TaskListPage() {
   useEffect(() => {
     if (user.user?.role === "admin") {
       getTeamTasks().then((data) => {
-        console.log("data", data);
-      });
+        setTeamStats(data ?? []);
+      })
+      .catch(console.error) 
       return;
     }
     getTasks()
       .then((data) => {
-        console.log("data", data);
         setTasks(data.tasks ?? []);
         setTeamName(data.team_name ?? "");
         setUsers(data.users ?? []);
       })
       .catch(console.error);
-  }, [setTasks, setTeamName, setUsers]);
+  }, [setTasks, setTeamName, setUsers, user.user?.role]);
 
   return (
     <div className="min-h-screen px-30 pt-5">
@@ -82,11 +97,24 @@ export default function TaskListPage() {
           </Link>
         )}
       </header>
+
+      {user.user?.role === "admin" ? (
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+{teamStats.map((team) => (
+  <div key={team.id} className="border rounded-lg p-4">
+    <h2 className="font-bold mb-2 text-center">
+      {team.team_name}
+    </h2>
+    <ProgressChart todo={team.status_counts.todo} in_progress={team.status_counts.in_progress} done={team.status_counts.done}/>
+  </div>
+))}
+</div>
+): (
       <ProgressChart
         todo={stats.todo}
         in_progress={stats.in_progress}
         done={stats.done}
-      />
+      />)}
       {user.user?.role !== "admin" && (
         <>
           <div className="border rounded-lg">

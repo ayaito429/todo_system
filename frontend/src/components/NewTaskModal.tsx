@@ -13,7 +13,7 @@ type Props = {
   task?: Task;
   mode?: "create" | "view" | "edit";
   onClose?: () => void;
-  users: User[];
+  users?: User[];
 };
 function formatDateOnly(isoString: string | undefined): string {
   if (!isoString) return "-";
@@ -21,7 +21,6 @@ function formatDateOnly(isoString: string | undefined): string {
 }
 
 export default function NewTaskModal({ task, mode, onClose, users }: Props) {
-  console.log("users", users);
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [due_date, setDueDate] = useState(task?.due_date || "");
@@ -231,6 +230,7 @@ export default function NewTaskModal({ task, mode, onClose, users }: Props) {
                     className="border border-gray-200 rounded px-3 py-2 w-full"
                   >
                     {users?.length ? (
+                      
                       users
                         .filter((u) => u.role !== "admin")
                         .map((u) => (

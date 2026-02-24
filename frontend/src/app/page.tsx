@@ -1,8 +1,7 @@
 "use client";
 import { changePasswordFirstTime, getMe, login } from "@/src/lib/api/auth";
 import { setAuthCookie } from "@/src/lib/cookie";
-import { Dice1, Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
+import {  Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useUser } from "../contexts/UserContext";
