@@ -2,7 +2,7 @@ from typing import List
 
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import date, datetime
 
 from schemas.user import UserResponse
@@ -61,8 +61,7 @@ class TaskResponse(BaseModel):
     # 更新日時
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskUpdate(BaseModel):
@@ -71,17 +70,17 @@ class TaskUpdate(BaseModel):
     """
 
     # タイトル
-    title: str | None
+    title: str | None = None
     # 詳細
-    description: str | None
+    description: str | None = None
     # 優先度
-    priority: str | None
+    priority: str | None = None
     # 期限日
-    due_date: date | None
+    due_date: date | None = None
     # ステータス
-    status: str | None
+    status: str | None = None
     # 担当ユーザー
-    user_id: int | None
+    user_id: int | None = None
 
 
 class StatusCounts(BaseModel):

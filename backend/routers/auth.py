@@ -22,12 +22,18 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     # メールでユーザーを1件取得
     login_user = user_repository.find_by_email(db, login_data.email)
 
-    # 平文パスワードとDBのハッシュを照合
+    if login_user is None:
+        raise AppException(
+            status_code=401,
+            error_code="Invalid credentials",
+            message="メールアドレスまたはパスワードが正しくありません。",
+        )
+
     if not verify_password(login_data.password, login_user.password):
         raise AppException(
             status_code=401,
-            error_code="USER_NOT_FOUND",
-            message="メールアドレスまたはパスワードが正しくありません",
+            error_code="Invalid credentials",
+            message="メールアドレスまたはパスワードが正しくありません。",
         )
 
     # JWT に sub（ユーザーID）と role を入れ、アクセストークンを発行
