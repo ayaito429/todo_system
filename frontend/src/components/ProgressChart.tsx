@@ -15,7 +15,7 @@ export function ProgressChart({ todo, in_progress, done }: Props) {
   if (total === 0) {
     return (
       <div className="flex items-center gap-6 rounded-lg border p-4">
-        <div className="h-32 w-32 rounded-full border-2 border-gray-200">
+        <div >
           <p className="text-sm text-gray-500">タスクがありません</p>
         </div>
       </div>

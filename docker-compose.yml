@@ -47,8 +47,7 @@ services:
       - frontend_node_modules:/app/node_modules  # node_modules はコンテナ用を保持（上書きされない）
     depends_on:
       - backend                    # backend のあとに起動（API が先に立つ）
-    command: npm run dev
-
+    command: sh -c "npm install && npm run dev"
 
 
 volumes:
