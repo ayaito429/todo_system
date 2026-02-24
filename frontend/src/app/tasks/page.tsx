@@ -8,6 +8,7 @@ import { useTaskList } from "@/src/contexts/TaskListContent";
 import { ProgressChart } from "@/src/components/ProgressChart";
 import { FilePlusCorner, UserRoundPlus, Users } from "lucide-react";
 import { useUser } from "@/src/contexts/UserContext";
+import { getTeamTasks } from "@/src/lib/api/teams";
 
 const PAGE_SIZE = 8;
 
@@ -35,6 +36,12 @@ export default function TaskListPage() {
   );
 
   useEffect(() => {
+    if (user.user?.role === "admin") {
+      getTeamTasks().then((data) => {
+        console.log("data", data);
+      });
+      return;
+    }
     getTasks()
       .then((data) => {
         console.log("data", data);
