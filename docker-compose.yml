@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:17
+    container_name: todo_db
+    env_file:
+      - ./backend/db/.env
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todo_user -d todo_system_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: todo_backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  # --- フロントエンド（Next.js）---
+  frontend:
+    build:
+      context: ./frontend # どのフォルダをビルドするか
+      dockerfile: Dockerfile # その中のどの Dockerfile を使うか
+    container_name: todo_frontend
+    environment:
+      # ブラウザが API を叩く先（ホストの localhost:8000）
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      # サーバーコンポーネントが Docker 内で fetch するときの先（コンテナ名で届く）
+      API_SERVER_URL: http://backend:8000
+    ports:
+      - "3000:3000" # ホストの3000番 → コンテナの3000番（Next.js）
+    volumes:
+      - ./frontend:/app # ローカルの frontend をコンテナの /app にマウント（node_modules もホストのものを使用）
+    depends_on:
+      - backend # backend のあとに起動（API が先に立つ）
+    command: npm run dev
+
+volumes:
+  postgres_data:
