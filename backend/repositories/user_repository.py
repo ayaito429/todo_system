@@ -71,7 +71,7 @@ def get_all_leaders(db: Session) -> List[User]:
     """
     全てのリーダー情報を取得
     """
-    return db.query(User).filter(User.role == 'leader').order_by(User.name).all()
+    return db.query(User).filter(User.role == "leader").order_by(User.name).all()
 
 
 def get_team_users(db: Session, team_id: int) -> List[User]:
@@ -81,6 +81,7 @@ def get_team_users(db: Session, team_id: int) -> List[User]:
     return (
         db.query(User)
         .filter(User.team_id == team_id)
+        .filter(User.role == "user")
         .filter(User.deleted_flag == False)
         .order_by(User.name)
         .all()
