@@ -24,7 +24,7 @@ export default function TaskDetailView() {
     if (taskFromContext || tasks.length > 0) return;
     setLoading(true);
     getTasks()
-      .then((all) => setFallbackTasks(all))
+      .then((all) => setFallbackTasks(all.tasks))
       .finally(() => setLoading(false));
   }, [taskFromContext, tasks.length]);
 
