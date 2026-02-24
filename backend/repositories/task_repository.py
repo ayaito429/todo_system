@@ -143,7 +143,7 @@ def get_status_counts(db: Session, team_id: int):
     result = (
         db.query(
             func.sum(case((Task.status == "未対応", 1), else_=0)).label("todo"),
-            func.sum(case((Task.status == "対応中", 1), else_=0)).label("inProgress"),
+            func.sum(case((Task.status == "対応中", 1), else_=0)).label("in_progress"),
             func.sum(case((Task.status == "完了", 1), else_=0)).label("done"),
         )
         .join(User, Task.user_id == User.id)
@@ -155,6 +155,6 @@ def get_status_counts(db: Session, team_id: int):
 
     return {
         "todo": result.todo or 0,
-        "inProgress": result.inProgress or 0,
+        "in_progress": result.in_progress or 0,
         "done": result.done or 0,
     }

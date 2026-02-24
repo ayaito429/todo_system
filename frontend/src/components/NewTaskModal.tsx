@@ -7,25 +7,27 @@ import { Task, TaskPriority, TaskStatus } from "../types/task";
 import StatusBadge from "./StatusBadge";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { useUser } from "../contexts/UserContext";
+import { User } from "../types/user";
 
 type Props = {
   task?: Task;
   mode?: "create" | "view" | "edit";
   onClose?: () => void;
+  users: User[];
 };
 function formatDateOnly(isoString: string | undefined): string {
   if (!isoString) return "-";
   return isoString.slice(0, 10);
 }
 
-export default function NewTaskModal({ task, mode, onClose }: Props) {
+export default function NewTaskModal({ task, mode, onClose, users }: Props) {
+  console.log("users", users);
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [due_date, setDueDate] = useState(task?.due_date || "");
   const [priority, setPriority] = useState<TaskPriority>(
     task?.priority || "高",
   );
-  const [user_id, setUserId] = useState(8);
   const [status, setStatus] = useState<TaskStatus>(task?.status || "未着手");
   const [currentMode, setCurrentMode] = useState<"create" | "view" | "edit">(
     mode ?? (task ? "view" : "create"),
@@ -44,6 +46,13 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
     due_date?: string;
   }>({});
   const { user } = useUser();
+
+  const [user_id, setUserId] = useState(() => {
+    if (task?.user_id != null) return task.user_id;
+    if (user?.role === "user" && user?.user_id != null) return user.user_id;
+    if (users?.length) return users[0].id ?? 0;
+    return 0;
+  });
 
   const canDelete =
     user != null && (user.role === "admin" || user.role === "leader");
@@ -206,18 +215,34 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
               </div>
               <div className="justify-between">
                 <label htmlFor="task-user-id">担当者</label>
-                <select
-                  name=""
-                  id="task-user-id"
-                  value={user_id}
-                  disabled={isView}
-                  onChange={(e) => setUserId(Number(e.target.value))}
-                  className="flex"
-                >
-                  <option value="1">田中</option>
-                  <option value="2">佐藤</option>
-                  <option value="3">山田</option>
-                </select>
+                {user?.role === "user" ? (
+                  <div
+                    id="task-user-id"
+                    className="border border-gray-200 rounded px-3 py-2 bg-gray-100 text-gray-700"
+                  >
+                    {user.name}
+                  </div>
+                ) : (
+                  <select
+                    id="task-user-id"
+                    value={user_id}
+                    disabled={isView}
+                    onChange={(e) => setUserId(Number(e.target.value))}
+                    className="border border-gray-200 rounded px-3 py-2 w-full"
+                  >
+                    {users?.length ? (
+                      users
+                        .filter((u) => u.role !== "admin")
+                        .map((u) => (
+                          <option key={u.id} value={u.id}>
+                            {u.name}
+                          </option>
+                        ))
+                    ) : (
+                      <option value={0}>-</option>
+                    )}
+                  </select>
+                )}
               </div>
             </div>
             <div className="flex justify-between items-center">

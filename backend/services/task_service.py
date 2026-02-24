@@ -120,7 +120,7 @@ def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitR
         team_name=team_name,
         status_counts=StatusCounts(
             todo=status_counts["todo"],
-            inProgress=status_counts["inProgress"],
+            in_progress=status_counts["in_progress"],
             done=status_counts["done"],
         ),
         total_counts=len(task_response),

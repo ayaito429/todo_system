@@ -6,13 +6,14 @@ import { getTasks } from "@/src/lib/api/tasks";
 import Link from "next/link";
 import { useTaskList } from "@/src/contexts/TaskListContent";
 import { ProgressChart } from "@/src/components/ProgressChart";
-import { FilePlusCorner, UserRoundPlus } from "lucide-react";
+import { FilePlusCorner, UserRoundPlus, Users } from "lucide-react";
 import { useUser } from "@/src/contexts/UserContext";
 
 const PAGE_SIZE = 8;
 
 export default function TaskListPage() {
-  const { tasks, setTasks } = useTaskList();
+  const { tasks, setTasks, team_name, setTeamName, users, setUsers } =
+    useTaskList();
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(tasks.length / PAGE_SIZE) || 1;
@@ -27,7 +28,7 @@ export default function TaskListPage() {
   const stats = useMemo(
     () => ({
       todo: tasks.filter((t) => t.status === "未着手").length,
-      inProgress: tasks.filter((t) => t.status === "対応中").length,
+      in_progress: tasks.filter((t) => t.status === "対応中").length,
       done: tasks.filter((t) => t.status === "完了").length,
     }),
     [tasks],
@@ -36,10 +37,13 @@ export default function TaskListPage() {
   useEffect(() => {
     getTasks()
       .then((data) => {
-        setTasks(data);
+        console.log("data", data);
+        setTasks(data.tasks ?? []);
+        setTeamName(data.team_name ?? "");
+        setUsers(data.users ?? []);
       })
       .catch(console.error);
-  }, [setTasks]);
+  }, [setTasks, setTeamName, setUsers]);
 
   return (
     <div className="min-h-screen px-30 pt-5">
@@ -55,55 +59,73 @@ export default function TaskListPage() {
       )}
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold tracking-tight">タスク一覧</h1>
-        <Link
-          href={"/tasks/new"}
-          className="border border-gray-200 rounded-md p-2 bg-blue-500 text-white w-30 flex justify-center w-40"
-        >
-          <FilePlusCorner />
-          タスク新規作成
-        </Link>
+        {(user.user?.role === "user" || user.user?.role === "leader") &&
+          team_name && (
+            <span className="text-3xl flex items-center">
+              <Users className="text-blue-500" />【{team_name}】
+            </span>
+          )}
+        {user.user?.role !== "admin" && (
+          <Link
+            href={"/tasks/new"}
+            className="border border-gray-200 rounded-md p-2 bg-blue-500 text-white w-30 flex justify-center w-40"
+          >
+            <FilePlusCorner />
+            タスク新規作成
+          </Link>
+        )}
       </header>
       <ProgressChart
         todo={stats.todo}
-        inProgress={stats.inProgress}
+        in_progress={stats.in_progress}
         done={stats.done}
       />
-      <div className="border rounded-lg">
-        <div className={`${gridLayout} px-4 py-3 text-sm font-medium border-b`}>
-          <div>タスク名</div>
-          <div>ステータス</div>
-          <div>優先度</div>
-          <div>期限</div>
-          <div>担当者</div>
-        </div>
-        <div className="bg-white [&>a:last-child>div]:border-b-0">
-          {displayedTasks.map((task) => (
-            <TaskCard key={task.id} task={task} layout={gridLayout} />
-          ))}
-        </div>
-      </div>
-      {totalPages > 1 && (
-        <div className="flex items-center m-5 justify-center">
-          <button
-            type="button"
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p - 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 border rounded disabled:opacity-50"
-          >
-            前へ
-          </button>
-          <span className="px-2">
-            {currentPage}/{totalPages}
-          </span>
-          <button
-            type="button"
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 border rounded disabled:opacity-50"
-          >
-            次へ
-          </button>
-        </div>
+      {user.user?.role !== "admin" && (
+        <>
+          <div className="border rounded-lg">
+            <div
+              className={`${gridLayout} px-4 py-3 text-sm font-medium border-b`}
+            >
+              <div>タスク名</div>
+              <div>ステータス</div>
+              <div>優先度</div>
+              <div>期限</div>
+              <div>担当者</div>
+            </div>
+            <div className="bg-white [&>a:last-child>div]:border-b-0">
+              {displayedTasks.map((task) => (
+                <TaskCard key={task.id} task={task} layout={gridLayout} />
+              ))}
+            </div>
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center m-5 justify-center">
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p - 1))
+                }
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                前へ
+              </button>
+              <span className="px-2">
+                {currentPage}/{totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                次へ
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

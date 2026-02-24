@@ -1,17 +1,17 @@
-import { Task , TaskCreate } from "@/src/types/task";
+import { Task, TaskCreate, TaskInitResponse } from "@/src/types/task";
 import { apiClient, getAuthHeaders } from "./client";
 
 // タスク一覧取得
-export async function getTasks(): Promise<Task[]> {
+export async function getTasks(): Promise<TaskInitResponse> {
   const url = `${apiClient.baseUrl}/api/tasks`;
-  const res = await fetch(url,{
-    headers: getAuthHeaders()
+  const res = await fetch(url, {
+    headers: getAuthHeaders(),
   });
   if (!res.ok) {
     throw new Error(`タスクが見つかりませんでした: ${res.status}`);
   }
   const data = await res.json();
-  return data as Task[];
+  return data as TaskInitResponse;
 }
 
 // タスク作成
@@ -28,8 +28,6 @@ export async function createTask(body: TaskCreate) {
   const data = await res.json();
   return data as Task;
 }
-
-
 
 // //タスク更新
 export async function updateTask(id: number, body: TaskCreate) {
@@ -57,5 +55,3 @@ export async function deleteTask(id: number) {
   }
   return await res;
 }
-
-
