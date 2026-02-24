@@ -8,3 +8,5 @@ pydantic-settings
 alembic
 passlib[argon2]
 python-jose[cryptography]
+httpx
+pytest
