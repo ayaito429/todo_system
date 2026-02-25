@@ -24,7 +24,7 @@ def create_task(
     認証済みユーザーのみ実行可能。作成者（created_by / updated_by）は認証ユーザーで固定。
     """
     task_in = task_in.model_copy(update={"login_user": current_user.id})
-    
+
     return task_service.create_task(db=db, task_in=task_in)
 
 
@@ -41,6 +41,7 @@ def init_info(
         db=db,
         user_role=current_user.role,
         team_id=current_user.team_id,
+        login_user_id=current_user.id,
     )
 
 
@@ -57,7 +58,9 @@ def task_update(
     更新者（updated_by）は認証ユーザーで上書きする（リクエストの login_user は使わない）。
     """
     # 更新者は必ず認証ユーザーにする（クライアント送信値は信頼しない）
-    task = task_service.update_task(db=db, task_id=task_id, update_task=update_task, updated_by=current_user.id)
+    task = task_service.update_task(
+        db=db, task_id=task_id, update_task=update_task, updated_by=current_user.id
+    )
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return task

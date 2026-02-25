@@ -22,6 +22,7 @@ def _mock_task_response(
     title: str = "タスク1",
     status: str = "未着手",
     user_id: int = 1,
+    team_id: int = 1,
 ):
     return {
         "id": id,
@@ -31,6 +32,7 @@ def _mock_task_response(
         "priority": "高",
         "due_date": date.today().isoformat(),
         "user_id": user_id,
+        "team_id": team_id,
         "user_name": "担当者",
         "created_by": 1,
         "created_name": "作成者",
@@ -86,6 +88,7 @@ def test_create_task_success(client: TestClient) -> None:
                     "priority": "高",
                     "due_date": date.today().isoformat(),
                     "user_id": 1,
+                    "team_id": 1,
                 },
                 headers={"Authorization": "Bearer dummy"},
             )
@@ -109,6 +112,7 @@ def test_create_task_without_token(client: TestClient) -> None:
             "priority": "高",
             "due_date": date.today().isoformat(),
             "user_id": 1,
+            "team_id": 1,
         },
     )
     assert response.status_code == 401
@@ -152,8 +156,8 @@ def test_get_tasks_without_token(client: TestClient) -> None:
 
 
 def test_get_tasks_success(client: TestClient) -> None:
-    """認証済みで GET /api/tasks すると TaskInitResponse が返る。"""
-    mock_user = _mock_current_user(role="user", team_id=1)
+    """認証済みで GET /api/tasks すると TaskInitResponse が返る。get_all_tasks は user_role, team_id, login_user_id 付きで呼ばれる。"""
+    mock_user = _mock_current_user(id=1, role="user", team_id=1)
     mock_db = MagicMock()
     mock_init = _mock_task_init_response(tasks_count=3)
 
@@ -163,7 +167,7 @@ def test_get_tasks_success(client: TestClient) -> None:
     def override_get_db():
         yield mock_db
 
-    with patch("routers.tasks.task_service.get_all_tasks", return_value=mock_init):
+    with patch("routers.tasks.task_service.get_all_tasks", return_value=mock_init) as m_get_all:
         from main import app
         from core.dependencies import get_current_user
         from db.session import get_db
@@ -180,6 +184,12 @@ def test_get_tasks_success(client: TestClient) -> None:
             assert "users" in body
             assert len(body["tasks"]) == 3
             assert body["team_name"] == "テストチーム"
+            # get_all_tasks がルーターから user_role, team_id, login_user_id 付きで呼ばれること
+            m_get_all.assert_called_once()
+            call_kw = m_get_all.call_args[1]
+            assert call_kw["user_role"] == "user"
+            assert call_kw["team_id"] == 1
+            assert call_kw["login_user_id"] == 1
         finally:
             app.dependency_overrides.pop(get_current_user, None)
             app.dependency_overrides.pop(get_db, None)
