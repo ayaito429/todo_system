@@ -1,10 +1,9 @@
 from typing import List
 from datetime import datetime, timezone
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from services.auth_service import validate_password
-from core.security import get_password_hash
 from db.models import User
 
 
@@ -74,14 +73,14 @@ def get_all_leaders(db: Session) -> List[User]:
     return db.query(User).filter(User.role == "leader").order_by(User.name).all()
 
 
-def get_team_users(db: Session, team_id: int) -> List[User]:
+def get_team_users(db: Session, team_id: int, login_user_id: int) -> List[User]:
     """
     指定したチームの全てのユーザーを取得
     """
     return (
         db.query(User)
         .filter(User.team_id == team_id)
-        .filter(User.role == "user")
+        .filter(or_(User.role == "user", User.id == login_user_id))
         .filter(User.deleted_flag == False)
         .order_by(User.name)
         .all()
