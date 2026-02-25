@@ -65,7 +65,9 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
     )
 
 
-def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitResponse:
+def get_all_tasks(
+    db: Session, user_role: str, team_id: int | None, login_user_id: int
+) -> TaskInitResponse:
     """
     初期表示情報取得
     """
@@ -77,7 +79,7 @@ def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitR
         users = []
     else:
         tasks = task_repository.get_by_team(db, team_id)
-        users = user_repository.get_team_users(db, team_id)
+        users = user_repository.get_team_users(db, team_id, login_user_id)
 
     # タスク一覧
     task_response = [
@@ -89,6 +91,7 @@ def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitR
             priority=task.priority,
             due_date=task.due_date,
             user_id=task.user_id,
+            team_id=task.team_id,
             created_by=task.created_by,
             updated_by=task.updated_by,
             created_at=task.created_at,

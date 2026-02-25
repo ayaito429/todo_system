@@ -75,6 +75,8 @@ export default function NewTaskModal({ task, mode, onClose, users }: Props) {
   const handleCreate = async () => {
     if (!validateCreate()) return;
     try {
+      const selectedUser = users?.find((u) => u.id === user_id);
+      const team_id = selectedUser?.team_id;
       await createTask({
         title: title,
         description: description,
@@ -83,6 +85,8 @@ export default function NewTaskModal({ task, mode, onClose, users }: Props) {
         due_date: due_date,
         user_id: user_id,
         login_user: user?.user_id ?? 0,
+        team_id: team_id ?? undefined
+        
         //  ispublic: ispublic,
       });
 

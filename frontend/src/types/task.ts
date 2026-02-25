@@ -21,6 +21,7 @@ export type Task = {
   updated_name?: string;
 
   deleted_at?: string;
+  team_id?:number
 };
 
 //タスク作成の型
@@ -37,6 +38,7 @@ export type TaskCreate = {
   deleted_at?: string;
   deleted_flag?: boolean;
   login_user: number;
+  team_id?: number;
 };
 
 export type TaskInitResponse = {
