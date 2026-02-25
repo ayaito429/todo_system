@@ -3,6 +3,8 @@ from datetime import datetime, timezone
 
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
+from services.auth_service import validate_password
+from core.security import get_password_hash
 
 from db.models import User
 
