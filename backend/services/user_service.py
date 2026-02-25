@@ -55,11 +55,14 @@ def create_user(db: Session, user_in: UserCreate) -> UserResponse:
 
 
 def get_user(db: Session, login_user: User) -> List[UserResponse]:
+    """
+    プルダウンに表示するユーザーを取得
+    """
 
     if login_user.role == "admin":
         users = user_repository.get_all_leaders(db)
     elif login_user.role == "leader":
-        users = user_repository.get_team_users(db, login_user.team_id)
+        users = user_repository.get_team_users(db, login_user.team_id, login_user.id)
     else:
         users = []
     return users

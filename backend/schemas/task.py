@@ -25,6 +25,8 @@ class TaskCreate(BaseModel):
     due_date: date = Field(...)
     # 担当ユーザーID
     user_id: int = Field(...)
+    # チームID
+    team_id: int = Field(...)
 
 
 class TaskResponse(BaseModel):
@@ -48,6 +50,8 @@ class TaskResponse(BaseModel):
     user_id: int
     # 担当ユーザー名（未割り当て時は None）
     user_name: str | None
+    # チームID
+    team_id: int
     # 作成ユーザーID
     created_by: int
     # 作成ユーザー名
