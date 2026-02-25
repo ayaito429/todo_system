@@ -1,0 +1,12 @@
+# Docker / 本番用（DB 接続含む）
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+python-dotenv
+pydantic-settings
+alembic
+passlib[argon2]
+python-jose[cryptography]
+httpx
+pytest

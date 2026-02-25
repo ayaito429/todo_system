@@ -1,0 +1,167 @@
+"use client";
+
+import { useEffect, useState, useMemo } from "react";
+import TaskCard from "@/src/components/TaskCard";
+import { getTasks } from "@/src/lib/api/tasks";
+import Link from "next/link";
+import { useTaskList } from "@/src/contexts/TaskListContent";
+import { ProgressChart } from "@/src/components/ProgressChart";
+import { FilePlusCorner, UserRoundPlus, Users } from "lucide-react";
+import { useUser } from "@/src/contexts/UserContext";
+import { getTeamTasks } from "@/src/lib/api/teams";
+
+const PAGE_SIZE = 8;
+
+type StatusCounts = {
+  todo: number;
+  done: number;
+in_progress: number
+
+}
+  type TeamStat = {
+    id: number;
+    team_name: string;
+    status_counts: StatusCounts
+    all_counts: number
+    // tasks: List[AdminTeamTasks]
+  }
+
+export default function TaskListPage() {
+  const { tasks, setTasks, team_name, setTeamName, users, setUsers } =
+    useTaskList();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [teamStats, setTeamStats] = useState<TeamStat[]>([])
+
+  const totalPages = Math.ceil(tasks.length / PAGE_SIZE) || 1;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const displayedTasks = tasks.slice(start, start + PAGE_SIZE);
+
+  const gridLayout =
+    "grid grid-cols-[1fr_120px_100px_120px_120px] gap-4 items-center";
+
+  const user = useUser();
+
+  const stats = useMemo(
+    () => ({
+      todo: tasks.filter((t) => t.status === "未着手").length,
+      in_progress: tasks.filter((t) => t.status === "対応中").length,
+      done: tasks.filter((t) => t.status === "完了").length,
+    }),
+    [tasks],
+  );
+
+  useEffect(() => {
+    if (user.user?.role === "admin") {
+      getTeamTasks().then((data) => {
+        setTeamStats(data ?? []);
+      })
+      .catch(console.error) 
+      return;
+    }
+    getTasks()
+      .then((data) => {
+        setTasks(data.tasks ?? []);
+        setTeamName(data.team_name ?? "");
+        setUsers(data.users ?? []);
+      })
+      .catch(console.error);
+  }, [setTasks, setTeamName, setUsers, user.user?.role]);
+
+  return (
+    <div className="min-h-screen px-30 pt-5">
+      {user.user?.role === "admin" && (
+        <div className="flex justify-end ">
+          <Link href="/addmember">
+            <div className="bg-green-200 flex p-2 rounded-lg mb-2 w-40 text-sm items-center">
+              <UserRoundPlus />
+              新規ユーザー登録
+            </div>
+          </Link>
+        </div>
+      )}
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold tracking-tight">タスク一覧</h1>
+        {(user.user?.role === "user" || user.user?.role === "leader") &&
+          team_name && (
+            <span className="text-3xl flex items-center">
+              <Users className="text-blue-500" />【{team_name}】
+            </span>
+          )}
+        {user.user?.role !== "admin" && (
+          <Link
+            href={"/tasks/new"}
+            className="border border-gray-200 rounded-md p-2 bg-blue-500 text-white w-30 flex justify-center w-40"
+          >
+            <FilePlusCorner />
+            タスク新規作成
+          </Link>
+        )}
+      </header>
+
+      {user.user?.role === "admin" ? (
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+{teamStats.map((team) => (
+  <div key={team.id} className="border rounded-lg p-4">
+    <h2 className="font-bold mb-2 text-center">
+      {team.team_name}
+    </h2>
+    <ProgressChart todo={team.status_counts.todo} in_progress={team.status_counts.in_progress} done={team.status_counts.done}/>
+  </div>
+))}
+</div>
+): (
+      <ProgressChart
+        todo={stats.todo}
+        in_progress={stats.in_progress}
+        done={stats.done}
+      />)}
+      {user.user?.role !== "admin" && (
+        <>
+          <div className="border rounded-lg">
+            <div
+              className={`${gridLayout} px-4 py-3 text-sm font-medium border-b`}
+            >
+              <div>タスク名</div>
+              <div>ステータス</div>
+              <div>優先度</div>
+              <div>期限</div>
+              <div>担当者</div>
+            </div>
+            <div className="bg-white [&>a:last-child>div]:border-b-0">
+              {displayedTasks.map((task) => (
+                <TaskCard key={task.id} task={task} layout={gridLayout} />
+              ))}
+            </div>
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center m-5 justify-center">
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p - 1))
+                }
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                前へ
+              </button>
+              <span className="px-2">
+                {currentPage}/{totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                次へ
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
