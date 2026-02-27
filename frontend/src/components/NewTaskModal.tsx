@@ -98,6 +98,8 @@ export default function NewTaskModal({ task, mode, onClose, users }: Props) {
 
   const handleUpdate = async () => {
     if (!task?.id) return;
+    const selectedUser = users?.find((u) => u.id === user_id);
+      const team_id = selectedUser?.team_id;
     try {
       await updateTask(task?.id, {
         title: title,
@@ -106,7 +108,9 @@ export default function NewTaskModal({ task, mode, onClose, users }: Props) {
         priority: priority,
         due_date: due_date,
         user_id: user_id,
-        login_user: 1,
+        login_user: user?.user_id ?? 0,
+        team_id: team_id ?? undefined
+
       });
       router.push("/tasks");
     } catch (error) {
