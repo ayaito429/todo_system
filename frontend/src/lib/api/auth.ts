@@ -31,7 +31,7 @@ export async function login(
   return res.json() as Promise<LoginResponse>;
 }
 
-export async function getMe(token: string) {
+export async function getMe(token: string): Promise<MeResponse> {
   const url = `${apiClient.baseUrl}/auth/me`;
   const res = await fetch(url, {
     headers: {
@@ -39,7 +39,6 @@ export async function getMe(token: string) {
     },
   });
   if (!res.ok) throw new Error("ユーザー情報の取得に失敗しました");
-  console.log("res",res)
   return res.json() as Promise<MeResponse>;
 }
 
