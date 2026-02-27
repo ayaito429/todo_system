@@ -6,38 +6,37 @@ import { createTask, deleteTask, updateTask } from "@/src/lib/api/tasks";
 import { Task, TaskPriority, TaskStatus } from "../types/task";
 import StatusBadge from "./StatusBadge";
 import { ArrowLeft, Trash2 } from "lucide-react";
+import { useUser } from "../contexts/UserContext";
+import { User } from "../types/user";
 
 type Props = {
   task?: Task;
   mode?: "create" | "view" | "edit";
   onClose?: () => void;
+  users?: User[];
 };
 function formatDateOnly(isoString: string | undefined): string {
   if (!isoString) return "-";
   return isoString.slice(0, 10);
 }
 
-export default function NewTaskModal({ task, mode, onClose }: Props) {
+export default function NewTaskModal({ task, mode, onClose, users }: Props) {
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [due_date, setDueDate] = useState(task?.due_date || "");
   const [priority, setPriority] = useState<TaskPriority>(
     task?.priority || "高",
   );
-  const [user_id, setUserId] = useState(1);
   const [status, setStatus] = useState<TaskStatus>(task?.status || "未着手");
-  const [ispublic, setPublic] = useState("");
   const [currentMode, setCurrentMode] = useState<"create" | "view" | "edit">(
     mode ?? (task ? "view" : "create"),
   );
-  // const [created_by,setCreatedBy] = useState("");
-  // const [updated_by,setUpdatedBy] = useState("");
+
   const router = useRouter();
   const isView = currentMode === "view";
   const isEdit = currentMode === "edit";
   const isCreate = currentMode === "create";
 
-  const isReadOnly = isView;
   const isFormMode = isCreate || isEdit;
 
   const [errors, setErrors] = useState<{
@@ -45,6 +44,23 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
     description?: string;
     due_date?: string;
   }>({});
+  const { user } = useUser();
+
+  const [user_id, setUserId] = useState(() => {
+    if (task?.user_id != null) return task.user_id;
+    if (user?.role === "user" && user?.user_id != null) return user.user_id;
+    if (users?.length) return users[0].id ?? 0;
+    return 0;
+  });
+
+  const canDelete =
+    user != null && (user.role === "admin" || user.role === "leader");
+
+  const canEdit =
+    user != null &&
+    (user.role === "admin" ||
+      user.role === "leader" ||
+      (user.role === "user" && task != null && task.user_id === user.user_id));
 
   const validateCreate = (): boolean => {
     const next: { title?: string; description?: string; due_date?: string } =
@@ -59,6 +75,8 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
   const handleCreate = async () => {
     if (!validateCreate()) return;
     try {
+      const selectedUser = users?.find((u) => u.id === user_id);
+      const team_id = selectedUser?.team_id;
       await createTask({
         title: title,
         description: description,
@@ -66,7 +84,9 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
         priority: priority,
         due_date: due_date,
         user_id: user_id,
-        login_user: 1,
+        login_user: user?.user_id ?? 0,
+        team_id: team_id ?? undefined
+        
         //  ispublic: ispublic,
       });
 
@@ -78,6 +98,8 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
 
   const handleUpdate = async () => {
     if (!task?.id) return;
+    const selectedUser = users?.find((u) => u.id === user_id);
+      const team_id = selectedUser?.team_id;
     try {
       await updateTask(task?.id, {
         title: title,
@@ -86,7 +108,9 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
         priority: priority,
         due_date: due_date,
         user_id: user_id,
-        login_user: 1,
+        login_user: user?.user_id ?? 0,
+        team_id: team_id ?? undefined
+
       });
       router.push("/tasks");
     } catch (error) {
@@ -198,45 +222,39 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
               </div>
               <div className="justify-between">
                 <label htmlFor="task-user-id">担当者</label>
-                <select
-                  name=""
-                  id="task-user-id"
-                  value={user_id}
-                  disabled={isView}
-                  onChange={(e) => setUserId(Number(e.target.value))}
-                  className="flex"
-                >
-                  <option value="1">田中</option>
-                  <option value="2">佐藤</option>
-                  <option value="3">山田</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="task-ispublic">公開設定</label>
-                <input
-                  type="radio"
-                  name="公開設定"
-                  id="task-ispublic-public"
-                  disabled={isView}
-                  value="public"
-                  checked={ispublic === "public"}
-                  onChange={(e) => setPublic(e.target.value)}
-                />
-                <label htmlFor="task-ispublic-public">公開</label>
-                <input
-                  type="radio"
-                  name="公開設定"
-                  id="task-ispublic-private"
-                  disabled={isView}
-                  value="private"
-                  checked={ispublic === "private"}
-                  onChange={(e) => setPublic(e.target.value)}
-                />
-                <label htmlFor="task-ispublic-private">非公開</label>
+                {user?.role === "user" ? (
+                  <div
+                    id="task-user-id"
+                    className="border border-gray-200 rounded px-3 py-2 bg-gray-100 text-gray-700"
+                  >
+                    {user.name}
+                  </div>
+                ) : (
+                  <select
+                    id="task-user-id"
+                    value={user_id}
+                    disabled={isView}
+                    onChange={(e) => setUserId(Number(e.target.value))}
+                    className="border border-gray-200 rounded px-3 py-2 w-full"
+                  >
+                    {users?.length ? (
+                      
+                      users
+                        .filter((u) => u.role !== "admin")
+                        .map((u) => (
+                          <option key={u.id} value={u.id}>
+                            {u.name}
+                          </option>
+                        ))
+                    ) : (
+                      <option value={0}>-</option>
+                    )}
+                  </select>
+                )}
               </div>
             </div>
             <div className="flex justify-between items-center">
-              {isEdit && task ? (
+              {isEdit && task && canDelete ? (
                 <button
                   type="button"
                   onClick={handleDelete}
@@ -272,14 +290,17 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
                 <h1 className="text-xl font-semibold text-gray-900 mb-4">
                   {title}
                 </h1>
+
                 <div className="ml-4 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentMode("edit")}
-                    className="border border-gray-200 rounded px-3 py-1 mr-2"
-                  >
-                    編集
-                  </button>
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentMode("edit")}
+                      className="border border-gray-200 rounded px-3 py-1 mr-2"
+                    >
+                      編集
+                    </button>
+                  )}
                 </div>
               </div>
               <div>
@@ -321,24 +342,10 @@ export default function NewTaskModal({ task, mode, onClose }: Props) {
                 <span>最終更新:{formatDateOnly(task?.updated_at)}</span>
                 <span className="mx-2">|</span>
                 <span>作成者:{task?.created_name}</span>
+                <span className="mx-2">|</span>
+                <span>更新者:{task?.updated_name}</span>
               </div>
             </div>
-
-            {/* <button
-              type="button"
-              onClick={handleDelete}
-              className="bg-red-500 text-white p-2 rounded h-10"
-              >
-              削除
-            </button>
-
-            <button
-              type="button"
-              onClick={onClose || (() => router.push("/tasks"))}
-              className="bg-green-500 text-white p-2 rounded h-10"
-            >
-              閉じる
-            </button> */}
           </>
         )}
       </div>

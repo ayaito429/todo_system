@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export type TaskStatus = "未着手" | "対応中" | "完了";
 export type TaskPriority = "高" | "中" | "低"; //1:高 2:中 3:低
 
@@ -16,7 +18,10 @@ export type Task = {
   created_by: string;
   created_name: string;
   updated_at: string;
+  updated_name?: string;
+
   deleted_at?: string;
+  team_id?:number
 };
 
 //タスク作成の型
@@ -33,4 +38,19 @@ export type TaskCreate = {
   deleted_at?: string;
   deleted_flag?: boolean;
   login_user: number;
+  team_id?: number;
+};
+
+export type TaskInitResponse = {
+  tasks: Task[];
+  team_name: string;
+  status_counts: StatusCounts;
+  total_counts: number;
+  users: User[];
+};
+
+export type StatusCounts = {
+  todo: number;
+  in_progress: number;
+  done: number;
 };

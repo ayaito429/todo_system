@@ -31,6 +31,7 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
         due_date=task_in.due_date,
         deleted_flag=False,
         user_id=task_in.user_id,
+        team_id=task_in.team_id,
         created_by=task_in.login_user,
         updated_by=task_in.login_user,
         created_at=datetime.now(timezone.utc),
@@ -53,6 +54,7 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
         priority=task.priority,
         due_date=task.due_date,
         user_id=task.user_id,
+        team_id=task.team_id,
         created_by=task.created_by,
         updated_by=task.updated_by,
         created_at=task.created_at,
@@ -63,7 +65,9 @@ def create_task(db: Session, task_in: TaskCreate) -> TaskResponse:
     )
 
 
-def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitResponse:
+def get_all_tasks(
+    db: Session, user_role: str, team_id: int | None, login_user_id: int
+) -> TaskInitResponse:
     """
     初期表示情報取得
     """
@@ -75,7 +79,7 @@ def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitR
         users = []
     else:
         tasks = task_repository.get_by_team(db, team_id)
-        users = user_repository.get_team_users(db, team_id)
+        users = user_repository.get_team_users(db, team_id, login_user_id)
 
     # タスク一覧
     task_response = [
@@ -87,6 +91,7 @@ def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitR
             priority=task.priority,
             due_date=task.due_date,
             user_id=task.user_id,
+            team_id=task.team_id,
             created_by=task.created_by,
             updated_by=task.updated_by,
             created_at=task.created_at,
@@ -120,7 +125,7 @@ def get_all_tasks(db: Session, user_role: str, team_id: int | None) -> TaskInitR
         team_name=team_name,
         status_counts=StatusCounts(
             todo=status_counts["todo"],
-            inProgress=status_counts["inProgress"],
+            in_progress=status_counts["in_progress"],
             done=status_counts["done"],
         ),
         total_counts=len(task_response),

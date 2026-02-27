@@ -1,5 +1,8 @@
 from typing import List
-from pydantic import BaseModel, Field
+
+from typing import Optional
+
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import date, datetime
 
 from schemas.user import UserResponse
@@ -22,6 +25,8 @@ class TaskCreate(BaseModel):
     due_date: date = Field(...)
     # 担当ユーザーID
     user_id: int = Field(...)
+    # チームID
+    team_id: int = Field(...)
 
 
 class TaskResponse(BaseModel):
@@ -45,6 +50,8 @@ class TaskResponse(BaseModel):
     user_id: int
     # 担当ユーザー名（未割り当て時は None）
     user_name: str | None
+    # チームID
+    team_id: int
     # 作成ユーザーID
     created_by: int
     # 作成ユーザー名
@@ -58,8 +65,7 @@ class TaskResponse(BaseModel):
     # 更新日時
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskUpdate(BaseModel):
@@ -68,19 +74,20 @@ class TaskUpdate(BaseModel):
     """
 
     # タイトル
-    title: str | None
+    title: str | None = None
     # 詳細
-    description: str | None
+    description: str | None = None
     # 優先度
-    priority: str | None
+    priority: str | None = None
     # 期限日
-    due_date: date | None
+    due_date: date | None = None
     # ステータス
-    status: str | None
+    status: str | None = None
     # 担当ユーザー
     user_id: int | None = None
     # チームID
     team_id: int
+
 
 
 class StatusCounts(BaseModel):
@@ -111,3 +118,14 @@ class TaskInitResponse(BaseModel):
     total_counts: int
     # ユーザー一覧（プルダウン表示用）
     users: List[UserResponse]
+
+
+class AdminTeamTasks(BaseModel):
+    """
+    管理者画面 初期表示APIレスポンス
+    """
+
+    id: int
+    title: str
+    status: str
+    due_date: Optional[date]
