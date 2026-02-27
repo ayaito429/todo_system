@@ -15,7 +15,10 @@ register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","https://todo-system-1jwr126sk-ayaito429s-projects.vercel.app/"],
+    allow_origins=[
+        "http://13.230.26.135:3000",
+        "todo-system-oxfky3e7o-ayaito429s-projects.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
