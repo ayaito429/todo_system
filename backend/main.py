@@ -17,7 +17,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://13.230.26.135:3000",
-        "todo-system-oxfky3e7o-ayaito429s-projects.vercel.app",
+        "https://todo-system-ten.vercel.app",
+        "http://localhost:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
