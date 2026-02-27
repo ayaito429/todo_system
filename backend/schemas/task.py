@@ -78,7 +78,9 @@ class TaskUpdate(BaseModel):
     # ステータス
     status: str | None
     # 担当ユーザー
-    user_id: int | None
+    user_id: int | None = None
+    # チームID
+    team_id: int
 
 
 class StatusCounts(BaseModel):
